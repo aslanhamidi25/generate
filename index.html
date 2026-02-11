@@ -3,37 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Caption Jualan</title>
+    <title>Generator Caption Spintax</title>
     
-    <!-- Tailwind CSS (Untuk Tampilan) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM (Engine Aplikasi) -->
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel (Agar browser bisa baca kode React) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Custom Scrollbar agar rapi */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af;
-        }
-        body {
-            overscroll-behavior: none; /* Mencegah bounce effect di Mac/iOS */
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        body { overscroll-behavior: none; }
     </style>
 </head>
 <body class="bg-gray-50 h-screen overflow-hidden text-gray-800 font-sans">
@@ -43,68 +30,85 @@
         const { useState, useEffect, useRef } = React;
 
         // --- ICONS ---
-        const IconShoppingBag = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        );
-        const IconRefreshCw = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
-        );
-        const IconCopy = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-        );
-        const IconCheck = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        );
-        const IconInfinity = () => (
-             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.33-6 4Z"/></svg>
-        );
+        const IconShoppingBag = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>;
+        const IconRefreshCw = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>;
+        const IconCopy = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
+        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+        const IconInfinity = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.33-6 4Z"/></svg>;
+        const IconWand = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>;
+
+        // --- SPINTAX LOGIC ---
+        const processSpintax = (text) => {
+            if (!text) return "";
+            let result = text;
+            // Regex untuk mencari {a|b|c}. Loop while untuk menangani nested spintax {a|{b|c}}
+            while (result.match(/\{([^{}]+)\}/)) {
+                result = result.replace(/\{([^{}]+)\}/g, (match, content) => {
+                    const choices = content.split('|');
+                    return choices[Math.floor(Math.random() * choices.length)];
+                });
+            }
+            return result;
+        };
 
         // --- APP COMPONENT ---
         function CaptionGenerator() {
             const [captionInput, setCaptionInput] = useState('');
-            const [uniqueIds, setUniqueIds] = useState([]);
+            // Items sekarang menyimpan object { id, text } karena text-nya unik per item (akibat Spintax)
+            const [items, setItems] = useState([]); 
             const [copiedIndex, setCopiedIndex] = useState(null);
             const [usedIndices, setUsedIndices] = useState([]);
 
-            // Fungsi Helper: Membuat array ID acak baru
-            const generateBatch = (count) => {
-                const newIds = [];
+            // Fungsi membuat batch baru dengan Spintax diproses saat generate
+            const generateBatch = (count, inputText) => {
+                const newItems = [];
                 for (let i = 0; i < count; i++) {
                     const min = 10000;
                     const max = 99999;
                     const randomNum = Math.floor(min + Math.random() * (max - min + 1));
-                    newIds.push(randomNum.toString());
+                    
+                    // PROSES SPINTAX DISINI
+                    const processedText = processSpintax(inputText);
+                    
+                    newItems.push({
+                        id: randomNum.toString(),
+                        text: processedText
+                    });
                 }
-                return newIds;
+                return newItems;
             };
 
-            // Reset: Kembali ke awal (hanya beberapa item)
-            const resetIds = () => {
-                // Awal load cukup 4 item saja agar ringan dan terlihat "cukup dua" di viewport kecil
-                const initialIds = generateBatch(4); 
-                setUniqueIds(initialIds);
+            // Reset: Generate ulang dari awal
+            const resetItems = () => {
+                const initialItems = generateBatch(4, captionInput); 
+                setItems(initialItems);
                 setUsedIndices([]);
             };
 
-            // Load More: Menambah item saat scroll
-            const loadMoreIds = () => {
-                const moreIds = generateBatch(5); // Tambah 5 item setiap scroll mentok
-                setUniqueIds(prev => [...prev, ...moreIds]);
+            // Load More: Tambah item saat scroll
+            const loadMoreItems = () => {
+                const moreItems = generateBatch(5, captionInput);
+                setItems(prev => [...prev, ...moreItems]);
             };
 
-            // Event Listener untuk Scroll
+            // Event Listener Scroll
             const handleScroll = (e) => {
                 const { scrollTop, scrollHeight, clientHeight } = e.target;
-                // Jika posisi scroll sudah mendekati bawah (kurang dari 50px)
                 if (scrollTop + clientHeight >= scrollHeight - 50) {
-                    loadMoreIds();
+                    loadMoreItems();
                 }
             };
 
+            // Efek awal load (kosongkan atau isi default jika perlu, disini kita biarkan kosong agar user paste)
             useEffect(() => {
-                resetIds();
+                // Tidak auto-generate saat pertama load agar user fokus input dulu
+                // Atau bisa generate kosong
             }, []);
 
+            // Handle Perubahan Input (PENTING UNTUK UX SPINTAX)
+            // Kita tidak update list secara live (karena spintax akan berganti2 terus setiap ketik)
+            // User harus klik tombol "Generate"
+            
             const handleCopy = (text, index) => {
                 try {
                     const textArea = document.createElement("textarea");
@@ -115,21 +119,15 @@
                     document.body.appendChild(textArea);
                     textArea.focus();
                     textArea.select();
-                    
-                    const successful = document.execCommand('copy');
+                    document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    if (successful) {
-                        setCopiedIndex(index);
-                        setTimeout(() => setCopiedIndex(null), 2000);
-                        
-                        if (!usedIndices.includes(index)) {
-                            setUsedIndices(prev => [...prev, index]);
-                        }
+                    setCopiedIndex(index);
+                    setTimeout(() => setCopiedIndex(null), 2000);
+                    if (!usedIndices.includes(index)) {
+                        setUsedIndices(prev => [...prev, index]);
                     }
-                } catch (err) {
-                    console.error('Terjadi error saat copy:', err);
-                }
+                } catch (err) { console.error(err); }
             };
 
             return (
@@ -140,9 +138,9 @@
                         <div className="bg-blue-600 p-4 text-white text-center shrink-0">
                             <h1 className="text-xl font-bold flex items-center justify-center gap-2">
                                 <IconShoppingBag />
-                                Generator Caption (Infinity)
+                                Generator Caption + Spintax
                             </h1>
-                            <p className="text-blue-100 mt-1 text-xs">Scroll ke bawah untuk menambah hasil secara otomatis tanpa batas</p>
+                            <p className="text-blue-100 mt-1 text-xs">Support {`{Kata1|Kata2}`} untuk variasi teks otomatis</p>
                         </div>
 
                         {/* Layout Utama */}
@@ -151,18 +149,29 @@
                             {/* Kolom Kiri: Input Form */}
                             <div className="md:col-span-5 flex flex-col border-b md:border-b-0 md:border-r border-gray-200 bg-white relative z-10 h-full overflow-hidden">
                                 <div className="p-4 flex-grow flex flex-col h-full overflow-hidden">
-                                    <div className="mb-2 shrink-0">
+                                    <div className="mb-2 shrink-0 flex justify-between items-end">
                                         <label className="font-bold text-gray-700 text-lg flex items-center gap-2">
-                                        Caption
+                                            Input Caption
                                         </label>
+                                        <span className="text-[10px] bg-yellow-100 text-yellow-800 px-2 py-1 rounded border border-yellow-200">
+                                            Gunakan format: {`{Halo|Hai}`}
+                                        </span>
                                     </div>
                                     
                                     <textarea 
                                         className="flex-grow w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition font-sans text-sm resize-none shadow-inner bg-gray-50 focus:bg-white"
-                                        placeholder="Tulis atau paste caption anda disini"
+                                        placeholder={`Contoh Spintax:\n\n{Jual|Ready} Laptop {Murah|Bagus}\nKondisi {Mulus|Like New}\nMinat? {PM|WA}`}
                                         value={captionInput}
                                         onChange={(e) => setCaptionInput(e.target.value)}
                                     />
+
+                                    {/* Tombol Generate Manual (Penting untuk Spintax agar tidak berubah tiap ketik) */}
+                                    <button 
+                                        onClick={resetItems}
+                                        className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-md active:scale-95"
+                                    >
+                                        <IconWand /> Generate / Update Hasil
+                                    </button>
                                 </div>
                             </div>
 
@@ -170,84 +179,91 @@
                             <div className="md:col-span-7 flex flex-col bg-gray-50/50 p-4 h-full overflow-hidden">
                                 <div className="flex justify-between items-center mb-4 shrink-0">
                                     <span className="font-semibold text-gray-700 flex items-center gap-2 text-sm md:text-base">
-                                        <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
-                                            <IconInfinity /> Infinite Scroll
+                                        <span className="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
+                                            <IconInfinity /> Hasil Variasi
                                         </span>
-                                        <span className="text-xs text-gray-400 font-normal hidden sm:inline">(Total: {uniqueIds.length} item)</span>
+                                        <span className="text-xs text-gray-400 font-normal hidden sm:inline">(Total: {items.length} item)</span>
                                     </span>
                                     
                                     <button 
-                                        onClick={resetIds}
+                                        onClick={resetItems}
                                         className="text-xs md:text-sm flex items-center gap-1 bg-white hover:bg-blue-50 text-blue-600 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-blue-200 transition shadow-sm font-medium"
-                                        title="Reset kembali ke awal"
                                     >
-                                        <IconRefreshCw /> <span className="hidden sm:inline">Reset & Acak</span>
+                                        <IconRefreshCw /> <span className="hidden sm:inline">Acak Ulang</span>
                                     </button>
                                 </div>
                                 
-                                {/* List Hasil - Vertical Scroll dengan Event onScroll */}
+                                {/* List Hasil */}
                                 <div 
                                     className="flex-1 overflow-y-auto min-h-0 pr-2 pb-4 space-y-4 custom-scrollbar"
                                     onScroll={handleScroll}
                                 >
-                                    {uniqueIds.map((id, index) => {
-                                        const fullText = `${captionInput}\n\n_ID: ${id}_`;
-                                        const isCopied = copiedIndex === index;
-                                        const isUsed = usedIndices.includes(index);
+                                    {items.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-40 text-gray-400 text-sm">
+                                            <p>Belum ada hasil.</p>
+                                            <p>Masukkan caption & klik tombol <b>Generate</b></p>
+                                        </div>
+                                    ) : (
+                                        items.map((item, index) => {
+                                            const fullText = `${item.text}\n\n_ID: ${item.id}_`;
+                                            const isCopied = copiedIndex === index;
+                                            const isUsed = usedIndices.includes(index);
 
-                                        return (
-                                            <div key={index} 
-                                                className={`w-full relative flex flex-col border rounded-xl shadow-sm transition-all duration-200 
-                                                ${isCopied ? 'border-green-500 ring-2 ring-green-100 bg-white' : 
-                                                  isUsed ? 'border-gray-300 bg-gray-100 opacity-80' : 
-                                                  'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}`}>
-                                                
-                                                {/* Header Item */}
-                                                <div className={`flex justify-between items-center p-3 border-b border-gray-100 rounded-t-xl shrink-0 
-                                                    ${isUsed ? 'bg-gray-200' : 'bg-gradient-to-r from-gray-50 to-white'}`}>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Opsi #{index + 1}</span>
-                                                        {isUsed && (
-                                                            <span className="text-[10px] bg-gray-600 text-white px-1.5 py-0.5 rounded font-medium">Sudah Dipakai</span>
-                                                        )}
+                                            return (
+                                                <div key={index} 
+                                                    className={`w-full relative flex flex-col border rounded-xl shadow-sm transition-all duration-200 
+                                                    ${isCopied ? 'border-green-500 ring-2 ring-green-100 bg-white' : 
+                                                      isUsed ? 'border-gray-300 bg-gray-100 opacity-80' : 
+                                                      'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}`}>
+                                                    
+                                                    {/* Header Item */}
+                                                    <div className={`flex justify-between items-center p-3 border-b border-gray-100 rounded-t-xl shrink-0 
+                                                        ${isUsed ? 'bg-gray-200' : 'bg-gradient-to-r from-gray-50 to-white'}`}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Variasi #{index + 1}</span>
+                                                            {isUsed && (
+                                                                <span className="text-[10px] bg-gray-600 text-white px-1.5 py-0.5 rounded font-medium">Sudah Dipakai</span>
+                                                            )}
+                                                        </div>
+                                                        <span className={`text-xs font-mono font-bold px-2 py-0.5 border rounded ${isUsed ? 'text-gray-500 bg-gray-100 border-gray-300' : 'text-blue-600 bg-blue-50 border-blue-100'}`}>ID: {item.id}</span>
                                                     </div>
-                                                    <span className={`text-xs font-mono font-bold px-2 py-0.5 border rounded ${isUsed ? 'text-gray-500 bg-gray-100 border-gray-300' : 'text-blue-600 bg-blue-50 border-blue-100'}`}>ID: {id}</span>
-                                                </div>
 
-                                                {/* Konten Teks */}
-                                                <div className="p-3">
-                                                    <p className={`font-mono text-xs whitespace-pre-wrap line-clamp-4 ${isUsed ? 'text-gray-500' : 'text-gray-600'}`}>
-                                                        {fullText}
-                                                    </p>
-                                                </div>
+                                                    {/* Konten Teks */}
+                                                    <div className="p-3">
+                                                        <p className={`font-mono text-xs whitespace-pre-wrap line-clamp-6 ${isUsed ? 'text-gray-500' : 'text-gray-600'}`}>
+                                                            {fullText}
+                                                        </p>
+                                                    </div>
 
-                                                {/* Tombol Copy */}
-                                                <div className={`p-3 border-t border-gray-100 rounded-b-xl shrink-0 ${isUsed ? 'bg-gray-200' : 'bg-gray-50'}`}>
-                                                    <button 
-                                                        onClick={() => handleCopy(fullText, index)}
-                                                        className={`w-full py-2 px-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
-                                                            isCopied 
-                                                            ? 'bg-green-500 text-white shadow-md transform scale-[1.01]' 
-                                                            : isUsed
-                                                                ? 'bg-gray-400 text-white hover:bg-gray-500' 
-                                                                : 'bg-gray-800 hover:bg-gray-900 text-white shadow-sm hover:shadow'
-                                                        }`}
-                                                    >
-                                                        {isCopied ? (
-                                                            <span className="flex items-center justify-center gap-2"><IconCheck /> Tersalin!</span>
-                                                        ) : (
-                                                            <span className="flex items-center justify-center gap-2"><IconCopy /> {isUsed ? 'Copy Lagi' : 'Copy Text'}</span>
-                                                        )}
-                                                    </button>
+                                                    {/* Tombol Copy */}
+                                                    <div className={`p-3 border-t border-gray-100 rounded-b-xl shrink-0 ${isUsed ? 'bg-gray-200' : 'bg-gray-50'}`}>
+                                                        <button 
+                                                            onClick={() => handleCopy(fullText, index)}
+                                                            className={`w-full py-2 px-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
+                                                                isCopied 
+                                                                ? 'bg-green-500 text-white shadow-md transform scale-[1.01]' 
+                                                                : isUsed
+                                                                    ? 'bg-gray-400 text-white hover:bg-gray-500' 
+                                                                    : 'bg-gray-800 hover:bg-gray-900 text-white shadow-sm hover:shadow'
+                                                            }`}
+                                                        >
+                                                            {isCopied ? (
+                                                                <span className="flex items-center justify-center gap-2"><IconCheck /> Tersalin!</span>
+                                                            ) : (
+                                                                <span className="flex items-center justify-center gap-2"><IconCopy /> {isUsed ? 'Copy Lagi' : 'Copy Text'}</span>
+                                                            )}
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })
+                                    )}
                                     
-                                    {/* Loading Indicator di bawah saat scroll */}
-                                    <div className="text-center py-4 text-gray-400 text-xs italic">
-                                        Scroll terus untuk hasil lebih banyak...
-                                    </div>
+                                    {items.length > 0 && (
+                                        <div className="text-center py-4 text-gray-400 text-xs italic">
+                                            Scroll terus untuk variasi lainnya...
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
