@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Caption Spintax</title>
+    <title>Generator Caption Ultimate</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,25 +21,71 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
         body { overscroll-behavior: none; }
+        
+        /* Animasi halus */
+        .fade-enter { opacity: 0; transform: translateY(10px); }
+        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 300ms, transform 300ms; }
     </style>
 </head>
-<body class="bg-gray-50 h-screen overflow-hidden text-gray-800 font-sans">
+<body class="bg-gray-100 h-screen overflow-hidden text-gray-800 font-sans">
     <div id="root" class="h-full"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // --- ICONS ---
-        const IconShoppingBag = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>;
-        const IconRefreshCw = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>;
-        const IconCopy = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
-        const IconCheck = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
-        const IconInfinity = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.33-6 4Z"/></svg>;
-        const IconWand = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>;
-        const IconEdit = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>;
-        const IconZap = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+        const Icon = ({ path }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
+                {path}
+            </svg>
+        );
+        
+        const paths = {
+            bag: <><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></>,
+            refresh: <><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></>,
+            copy: <><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></>,
+            check: <polyline points="20 6 9 17 4 12"/>,
+            infinity: <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.33-6 4Z"/>,
+            wand: <><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></>,
+            wa: <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />,
+            download: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>,
+            settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>,
+            hash: <><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></>
+        };
 
-        // --- SPINTAX LOGIC ---
+        // --- DATABASE TEMPLATES ---
+        const CATEGORY_TEMPLATES = {
+            gadget: {
+                label: "Gadget & Elektronik",
+                opening: "{izin posting min|izin share min|izin lapak min|permisi posting min|numpang posting min|ijin posting admin}",
+                conditions: "{baru|new|kondisi baru|fresh unit|belum pernah dipakai} {fullset|lengkap|kelengkapan lengkap|set lengkap}, {segel|masih segel|segel pabrik}, {garansi|bergaransi|jaminan} {resmi|official}",
+                priceLabel: "{harga murah|harga terjangkau|best price|harga promo|harga spesial}",
+                placeholder: "Contoh: Sony A6000 Kit"
+            },
+            fashion: {
+                label: "Fashion & Baju",
+                opening: "{Ready Stock|Hadir Lagi|New Arrival|Restock Sist|Koleksi Baru}",
+                conditions: "{Bahan adem|Kualitas premium|Jahitan rapi|Nyaman dipakai} {All Size|Ukuran Lengkap|Tersedia M/L/XL}, {Warna cantik|Pilihan warna banyak}, {Real pict|Foto asli|Sesuai gambar}",
+                priceLabel: "{Harga promo|Diskon khusus|Harga cantik|Murah meriah}",
+                placeholder: "Contoh: Gamis Rayon Premium"
+            },
+            food: {
+                label: "Makanan & Kuliner",
+                opening: "{Open PO|Ready Hari Ini|Siap Antar|Fresh from Oven|Menu Baru}",
+                conditions: "{Enak|Lezat|Gurih|Nikmat|Bikin nagih} {Tanpa pengawet|Bahan alami|100% Halal|Higienis}, {Made by order|Freshly made|Masih hangat}, {Bisa COD|Siap delivery}",
+                priceLabel: "{Harga hemat|Paket hemat|Murah banget|Cuma}",
+                placeholder: "Contoh: Sambal Cumi Pete"
+            },
+            services: {
+                label: "Jasa & Layanan",
+                opening: "{Open Jasa|Melayani|Siap Membantu|Butuh Bantuan?|Solusi Tepat}",
+                conditions: "{Profesional|Berpengalaman|Terpercaya|Amanah}, {Pengerjaan cepat|Hasil rapi|On time}, {Free konsultasi|Garansi revisi|Layanan 24 jam}",
+                priceLabel: "{Biaya terjangkau|Rate bersahabat|Harga nego|Mulai dari}",
+                placeholder: "Contoh: Jasa Desain Logo"
+            }
+        };
+
+        // --- UTILS ---
         const processSpintax = (text) => {
             if (!text) return "";
             let result = text;
@@ -52,67 +98,140 @@
             return result;
         };
 
-        // --- SPINTAX TEMPLATES (AUTOMATIC MODE) ---
-        const AUTO_TEMPLATES = {
-            opening: "{izin posting min|izin share min|izin lapak min|izin promosi min|permisi posting min|numpang posting min|ijin posting admin|min, izin posting}",
-            conditions: "{baru|new|kondisi baru|fresh unit|belum pernah dipakai|masih baru} {fullset|lengkap|kelengkapan lengkap|full kelengkapan|set lengkap|paket lengkap}, {segel|masih segel|segel pabrik|segel utuh|belum dibuka|segel resmi}, {garansi|bergaransi|jaminan|ada garansi|garansi resmi} {resmi|official|original|ori|legal}",
-            priceLabel: "{harga murah|harga terjangkau|harga bersahabat|best price|harga promo|harga spesial hari ini|harga deal terbaik}",
-            linkLabel: "{link pembelian|link beli|link checkout|link order|tautan pembelian|tautan beli|link pemesanan|link transaksi}"
+        const generateHashtags = (keywords) => {
+            if (!keywords.trim()) return "";
+            const words = keywords.split(',').map(w => w.trim()).filter(w => w);
+            const baseTags = words.map(w => `#${w.replace(/\s+/g, '')}`).join(' ');
+            const genericTags = " #fyp #viral #rekomendasi #jualbelionline";
+            // DIEDIT: Menggunakan \n (satu baris) agar rapat
+            return `\n${baseTags}${genericTags}`;
         };
 
         // --- APP COMPONENT ---
         function CaptionGenerator() {
-            // Tab State: 'manual' or 'auto'
+            // -- STATE --
             const [activeTab, setActiveTab] = useState('manual');
-            
-            // Manual Input State
+            const [selectedCategory, setSelectedCategory] = useState('gadget');
             const [captionInput, setCaptionInput] = useState('');
             
-            // Auto Input State
+            // Auto Form Data
             const [autoForm, setAutoForm] = useState({
                 productName: '',
                 price: '',
-                link: ''
+                link: '',
+                description: ''
+            });
+            const [hashtags, setHashtags] = useState('');
+
+            // ID Settings
+            const [idSettings, setIdSettings] = useState({
+                prefix: '',
+                mode: 'random', // 'random' or 'sequential'
+                startSeq: 1
             });
 
-            // Results State
-            const [items, setItems] = useState([]); 
+            // Results
+            const [items, setItems] = useState([]);
             const [copiedIndex, setCopiedIndex] = useState(null);
             const [usedIndices, setUsedIndices] = useState([]);
 
-            // Effect: Construct Caption when in Auto Mode
+            // -- EFFECTS --
+
+            // 1. Load Data from LocalStorage on Mount
+            useEffect(() => {
+                const savedData = localStorage.getItem('captionGenData_v2');
+                if (savedData) {
+                    const parsed = JSON.parse(savedData);
+                    setAutoForm(parsed.autoForm || { productName: '', price: '', link: '', description: '' });
+                    setHashtags(parsed.hashtags || '');
+                    setIdSettings(parsed.idSettings || { prefix: '', mode: 'random', startSeq: 1 });
+                    setSelectedCategory(parsed.selectedCategory || 'gadget');
+                }
+            }, []);
+
+            // 2. Save Data to LocalStorage on Change
+            useEffect(() => {
+                const dataToSave = {
+                    autoForm,
+                    hashtags,
+                    idSettings,
+                    selectedCategory
+                };
+                localStorage.setItem('captionGenData_v2', JSON.stringify(dataToSave));
+            }, [autoForm, hashtags, idSettings, selectedCategory]);
+
+            // 3. Construct Caption for Auto Mode
             useEffect(() => {
                 if (activeTab === 'auto') {
-                    const constructedCaption = 
-`${AUTO_TEMPLATES.opening}
+                    const template = CATEGORY_TEMPLATES[selectedCategory];
+                    const tagString = generateHashtags(hashtags);
+                    
+                    // DIEDIT: Logika baru untuk spasi sesuai request user
+                    // "yang di kasi jarak hanya pada Jarak setelah Kondisi (sebelum Harga). yang lain ndak ada baris kosong"
+                    let caption = "";
 
-${autoForm.productName || "[Nama Barang]"}
+                    // 1. Opening (Enter 1x -> Rapat)
+                    caption += template.opening + "\n";
 
-${AUTO_TEMPLATES.conditions}
+                    // 2. Nama Produk (Enter 1x -> Rapat)
+                    caption += (autoForm.productName || "[Nama Produk]") + "\n";
 
-${AUTO_TEMPLATES.priceLabel} : Rp.${autoForm.price || "..."}
+                    // 3. Deskripsi & Kondisi
+                    if (autoForm.description) {
+                        caption += autoForm.description + "\n";
+                    }
+                    
+                    // Kondisi -> (Enter 2x -> Ada Baris Kosong)
+                    caption += template.conditions + "\n\n";
 
-${AUTO_TEMPLATES.linkLabel} : 
-${autoForm.link || "..."}`;
+                    // 4. Harga (Enter 1x -> Rapat)
+                    caption += `${template.priceLabel} : Rp.${autoForm.price || "..."}\n`;
 
-                    setCaptionInput(constructedCaption);
+                    // 5. Link + Hashtag (Rapat)
+                    caption += `${template.linkLabel || "Link/Kontak"} : ${autoForm.link || "..."}${tagString}`;
+
+                    setCaptionInput(caption);
                 }
-            }, [activeTab, autoForm]);
+            }, [activeTab, autoForm, hashtags, selectedCategory]);
 
-            // Fungsi Generate Batch
+
+            // -- FUNCTIONS --
+
+            const generateID = (indexForSeq) => {
+                const { prefix, mode, startSeq } = idSettings;
+                let idBody = "";
+                
+                if (mode === 'sequential') {
+                    const currentSeq = parseInt(startSeq) + items.length + indexForSeq;
+                    idBody = currentSeq.toString().padStart(4, '0');
+                } else {
+                    const min = 10000;
+                    const max = 99999;
+                    idBody = Math.floor(min + Math.random() * (max - min + 1)).toString();
+                }
+
+                return prefix ? `${prefix}-${idBody}` : idBody;
+            };
+
             const generateBatch = (count, inputText) => {
                 const newItems = [];
                 for (let i = 0; i < count; i++) {
-                    const min = 10000;
-                    const max = 99999;
-                    const randomNum = Math.floor(min + Math.random() * (max - min + 1));
+                    const newId = generateID(i);
                     const processedText = processSpintax(inputText);
                     
                     newItems.push({
-                        id: randomNum.toString(),
+                        id: newId,
                         text: processedText
                     });
                 }
+                
+                if (idSettings.mode === 'sequential') {
+                    setIdSettings(prev => ({
+                        ...prev,
+                        startSeq: parseInt(prev.startSeq) + count
+                    }));
+                }
+
                 return newItems;
             };
 
@@ -134,7 +253,8 @@ ${autoForm.link || "..."}`;
                 }
             };
 
-            const handleCopy = (text, index) => {
+            // Actions
+            const copyText = (text, index) => {
                 try {
                     const textArea = document.createElement("textarea");
                     textArea.value = text;
@@ -144,237 +264,314 @@ ${autoForm.link || "..."}`;
                     document.body.appendChild(textArea);
                     textArea.focus();
                     textArea.select();
-                    document.execCommand('copy');
+                    
+                    const successful = document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    setCopiedIndex(index);
-                    setTimeout(() => setCopiedIndex(null), 2000);
-                    if (!usedIndices.includes(index)) {
-                        setUsedIndices(prev => [...prev, index]);
+                    if (successful) {
+                        setCopiedIndex(index);
+                        setTimeout(() => setCopiedIndex(null), 2000);
+                        if (!usedIndices.includes(index)) setUsedIndices(prev => [...prev, index]);
+                    } else {
+                        navigator.clipboard.writeText(text).then(() => {
+                            setCopiedIndex(index);
+                            setTimeout(() => setCopiedIndex(null), 2000);
+                            if (!usedIndices.includes(index)) setUsedIndices(prev => [...prev, index]);
+                        }).catch(e => console.error("Clipboard failed", e));
                     }
-                } catch (err) { console.error(err); }
+                } catch (err) {
+                    console.error('Copy error:', err);
+                }
             };
 
-            // Input handlers for Auto Form
-            const handleAutoChange = (field, value) => {
-                setAutoForm(prev => ({
-                    ...prev,
-                    [field]: value
-                }));
+            const openWA = (text) => {
+                const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                window.open(url, '_blank');
+            };
+
+            const exportCSV = () => {
+                if (items.length === 0) return alert("Generate dulu captionnya!");
+                
+                const exportBatch = generateBatch(50, captionInput);
+                
+                let csvContent = "data:text/csv;charset=utf-8,ID,Caption\n";
+                exportBatch.forEach(row => {
+                    const safeText = row.text.replace(/"/g, '""'); 
+                    csvContent += `${row.id},"${safeText}"\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "caption_stok.csv");
+                document.body.appendChild(link);
+                link.click();
             };
 
             return (
-                <div className="h-screen bg-gray-50 py-4 px-4 font-sans text-gray-800 flex flex-col overflow-hidden">
-                    <div className="max-w-7xl mx-auto w-full bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col h-full overflow-hidden">
-                        
-                        {/* Header */}
-                        <div className="bg-blue-600 p-4 text-white text-center shrink-0">
-                            <h1 className="text-xl font-bold flex items-center justify-center gap-2">
-                                <IconShoppingBag />
-                                Generator Caption + Spintax
-                            </h1>
-                            <p className="text-blue-100 mt-1 text-xs">Pilih mode input dan dapatkan variasi caption otomatis</p>
+                <div className="h-screen flex flex-col overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-700 to-blue-600 p-4 text-white shadow-md shrink-0 z-20">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+                            <div>
+                                <h1 className="text-xl font-bold flex items-center gap-2">
+                                    <Icon path={paths.bag} /> Generator Caption Ultimate
+                                </h1>
+                                <p className="text-blue-100 text-xs hidden md:block">Tool jualan lengkap dengan Spintax, WhatsApp, & Export Excel</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button onClick={exportCSV} className="bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow transition">
+                                    <Icon path={paths.download} /> Export Excel
+                                </button>
+                            </div>
                         </div>
+                    </div>
 
-                        {/* Layout Utama */}
-                        <div className="flex-grow grid grid-cols-1 md:grid-cols-12 overflow-hidden h-full">
+                    <div className="flex-grow grid grid-cols-1 md:grid-cols-12 overflow-hidden max-w-7xl mx-auto w-full">
+                        
+                        {/* LEFT: INPUT & SETTINGS */}
+                        <div className="md:col-span-5 flex flex-col bg-white border-r border-gray-200 z-10 h-full overflow-hidden">
                             
-                            {/* Kolom Kiri: Input Form */}
-                            <div className="md:col-span-5 flex flex-col border-b md:border-b-0 md:border-r border-gray-200 bg-white relative z-10 h-full overflow-hidden">
-                                <div className="p-4 flex-grow flex flex-col h-full overflow-hidden">
-                                    
-                                    {/* Tab Switcher */}
-                                    <div className="flex bg-gray-100 p-1 rounded-lg mb-4 shrink-0">
-                                        <button 
-                                            onClick={() => setActiveTab('manual')}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'manual' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        >
-                                            <IconEdit /> Manual Spintax
-                                        </button>
-                                        <button 
-                                            onClick={() => setActiveTab('auto')}
-                                            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-bold rounded-md transition-all ${activeTab === 'auto' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        >
-                                            <IconZap /> Spintax Otomatis
-                                        </button>
-                                    </div>
+                            {/* Tabs & Config */}
+                            <div className="p-4 bg-gray-50 border-b border-gray-200 overflow-y-auto custom-scrollbar" style={{maxHeight: '40%'}}>
+                                {/* Kategori Dropdown */}
+                                <div className="mb-4">
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Kategori Produk</label>
+                                    <select 
+                                        value={selectedCategory}
+                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                        className="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        {Object.keys(CATEGORY_TEMPLATES).map(key => (
+                                            <option key={key} value={key}>{CATEGORY_TEMPLATES[key].label}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                                    {/* CONTENT: MANUAL MODE */}
-                                    {activeTab === 'manual' && (
-                                        <div className="flex flex-col h-full overflow-hidden animate-fade-in">
-                                            <div className="mb-2 shrink-0 flex justify-between items-end">
-                                                <label className="font-bold text-gray-700 text-sm">
-                                                    Input Raw Caption
-                                                </label>
-                                                <span className="text-[10px] bg-yellow-100 text-yellow-800 px-2 py-1 rounded border border-yellow-200">
-                                                    Format: {`{Halo|Hai}`}
-                                                </span>
-                                            </div>
-                                            <textarea 
-                                                className="flex-grow w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition font-sans text-sm resize-none shadow-inner bg-gray-50 focus:bg-white"
-                                                placeholder={`Contoh Spintax:\n\n{Jual|Ready} Laptop {Murah|Bagus}\nKondisi {Mulus|Like New}\nMinat? {PM|WA}`}
-                                                value={captionInput}
-                                                onChange={(e) => setCaptionInput(e.target.value)}
+                                {/* ID Settings */}
+                                <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                    <div className="flex items-center gap-2 mb-2 text-gray-700 font-bold text-xs uppercase">
+                                        <Icon path={paths.settings} /> Pengaturan ID Unik
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Prefix (opsional)" 
+                                            className="p-2 border rounded text-xs"
+                                            value={idSettings.prefix}
+                                            onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})}
+                                        />
+                                        <select 
+                                            className="p-2 border rounded text-xs"
+                                            value={idSettings.mode}
+                                            onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}
+                                        >
+                                            <option value="random">Acak (Random)</option>
+                                            <option value="sequential">Urut (001, 002)</option>
+                                        </select>
+                                    </div>
+                                    {idSettings.mode === 'sequential' && (
+                                        <div className="mt-2 flex items-center gap-2">
+                                            <label className="text-xs text-gray-500">Mulai dari:</label>
+                                            <input 
+                                                type="number" 
+                                                className="p-1 border rounded w-20 text-xs"
+                                                value={idSettings.startSeq}
+                                                onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})}
                                             />
                                         </div>
                                     )}
+                                </div>
 
-                                    {/* CONTENT: AUTO MODE */}
-                                    {activeTab === 'auto' && (
-                                        <div className="flex flex-col h-full overflow-y-auto pr-1 animate-fade-in custom-scrollbar">
-                                            <div className="mb-4 bg-blue-50 p-3 rounded-lg border border-blue-100 text-xs text-blue-800">
-                                                <b>Info:</b> Kolom di bawah ini akan otomatis dibungkus dengan kalimat promosi (Spintax) yang sudah disetting.
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Nama Barang</label>
-                                                    <input 
-                                                        type="text" 
-                                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                                        placeholder="Contoh: Sony A6000 Kit"
-                                                        value={autoForm.productName}
-                                                        onChange={(e) => handleAutoChange('productName', e.target.value)}
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Harga (Rp)</label>
-                                                    <div className="relative">
-                                                        <span className="absolute left-3 top-3 text-gray-500 text-sm">Rp.</span>
-                                                        <input 
-                                                            type="text" 
-                                                            className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                                            placeholder="1.xxx.xxx"
-                                                            value={autoForm.price}
-                                                            onChange={(e) => handleAutoChange('price', e.target.value)}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <label className="block text-sm font-bold text-gray-700 mb-1">Link Pembelian / Kontak</label>
-                                                    <textarea 
-                                                        rows="3"
-                                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                                                        placeholder="https://shopee.co.id/..."
-                                                        value={autoForm.link}
-                                                        onChange={(e) => handleAutoChange('link', e.target.value)}
-                                                    />
-                                                </div>
-
-                                                <div className="pt-2">
-                                                    <label className="block text-xs font-semibold text-gray-500 mb-1">Preview Spintax (Otomatis):</label>
-                                                    <div className="p-2 bg-gray-100 rounded text-[10px] text-gray-600 font-mono h-24 overflow-y-auto border border-gray-200">
-                                                        {captionInput || "Isi form di atas untuk melihat preview..."}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Tombol Generate Manual */}
+                                {/* Mode Switcher */}
+                                <div className="flex bg-gray-200 p-1 rounded-lg">
                                     <button 
-                                        onClick={resetItems}
-                                        className="mt-4 shrink-0 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-md active:scale-95"
+                                        onClick={() => setActiveTab('manual')}
+                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md transition ${activeTab === 'manual' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'}`}
                                     >
-                                        <IconWand /> Generate / Update Hasil
+                                        Manual Input
+                                    </button>
+                                    <button 
+                                        onClick={() => setActiveTab('auto')}
+                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md transition ${activeTab === 'auto' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'}`}
+                                    >
+                                        Otomatis
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Kolom Kanan: Hasil Infinity Scroll */}
-                            <div className="md:col-span-7 flex flex-col bg-gray-50/50 p-4 h-full overflow-hidden">
-                                <div className="flex justify-between items-center mb-4 shrink-0">
-                                    <span className="font-semibold text-gray-700 flex items-center gap-2 text-sm md:text-base">
-                                        <span className="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full shadow-sm flex items-center gap-1">
-                                            <IconInfinity /> Hasil Variasi
-                                        </span>
-                                        <span className="text-xs text-gray-400 font-normal hidden sm:inline">(Total: {items.length} item)</span>
-                                    </span>
-                                    
-                                    <button 
-                                        onClick={resetItems}
-                                        className="text-xs md:text-sm flex items-center gap-1 bg-white hover:bg-blue-50 text-blue-600 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-blue-200 transition shadow-sm font-medium"
-                                    >
-                                        <IconRefreshCw /> <span className="hidden sm:inline">Acak Ulang</span>
-                                    </button>
-                                </div>
-                                
-                                {/* List Hasil */}
-                                <div 
-                                    className="flex-1 overflow-y-auto min-h-0 pr-2 pb-4 space-y-4 custom-scrollbar"
-                                    onScroll={handleScroll}
+                            {/* Main Input Area */}
+                            <div className="flex-grow p-4 overflow-y-auto custom-scrollbar">
+                                {activeTab === 'manual' ? (
+                                    <div className="h-full flex flex-col">
+                                        <textarea 
+                                            className="flex-grow w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none"
+                                            placeholder={`Paste caption Spintax disini...\nContoh: {Jual|Ready} Barang {Bagus|Murah}`}
+                                            value={captionInput}
+                                            onChange={(e) => setCaptionInput(e.target.value)}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3 pb-20">
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-600">Nama Produk</label>
+                                            <input 
+                                                type="text" 
+                                                className="w-full p-2 border rounded focus:ring-1 focus:ring-blue-500"
+                                                placeholder={CATEGORY_TEMPLATES[selectedCategory].placeholder}
+                                                value={autoForm.productName}
+                                                onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-600">Deskripsi Tambahan (Opsional)</label>
+                                            <textarea 
+                                                rows="2"
+                                                className="w-full p-2 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+                                                placeholder="Warna merah, size L..."
+                                                value={autoForm.description}
+                                                onChange={(e) => setAutoForm({...autoForm, description: e.target.value})}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-600">Harga</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="150.000"
+                                                    value={autoForm.price}
+                                                    onChange={(e) => setAutoForm({...autoForm, price: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-600">Link / Kontak</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full p-2 border rounded"
+                                                    placeholder="shopee.co.id/..."
+                                                    value={autoForm.link}
+                                                    onChange={(e) => setAutoForm({...autoForm, link: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Hashtag Builder */}
+                                        <div className="pt-2 border-t border-dashed">
+                                            <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
+                                                <Icon path={paths.hash} /> Hashtag (Pisahkan dengan koma)
+                                            </label>
+                                            <input 
+                                                type="text"
+                                                className="w-full p-2 border rounded bg-gray-50 text-sm"
+                                                placeholder="sepatu, murah, promo"
+                                                value={hashtags}
+                                                onChange={(e) => setHashtags(e.target.value)}
+                                            />
+                                            <p className="text-[10px] text-gray-400 mt-1">Otomatis ditambah: #fyp #viral #rekomendasi</p>
+                                        </div>
+
+                                        {/* Preview Box */}
+                                        <div className="p-2 bg-yellow-50 border border-yellow-100 rounded text-[10px] text-gray-600 font-mono h-20 overflow-y-auto">
+                                            <span className="font-bold text-yellow-700 block mb-1">Preview Raw Spintax:</span>
+                                            {captionInput || "..."}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Generate Button (Sticky Bottom Left) */}
+                            <div className="p-4 bg-white border-t border-gray-200">
+                                <button 
+                                    onClick={resetItems}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition"
                                 >
-                                    {items.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center h-40 text-gray-400 text-sm">
-                                            <p>Belum ada hasil.</p>
-                                            <p>Masukkan caption & klik tombol <b>Generate</b></p>
-                                        </div>
-                                    ) : (
-                                        items.map((item, index) => {
-                                            const fullText = `${item.text}\n\n_ID: ${item.id}_`;
-                                            const isCopied = copiedIndex === index;
-                                            const isUsed = usedIndices.includes(index);
+                                    <Icon path={paths.wand} /> GENERATE HASIL
+                                </button>
+                            </div>
+                        </div>
 
-                                            return (
-                                                <div key={index} 
-                                                    className={`w-full relative flex flex-col border rounded-xl shadow-sm transition-all duration-200 
-                                                    ${isCopied ? 'border-green-500 ring-2 ring-green-100 bg-white' : 
-                                                      isUsed ? 'border-gray-300 bg-gray-100 opacity-80' : 
-                                                      'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'}`}>
-                                                    
-                                                    {/* Header Item */}
-                                                    <div className={`flex justify-between items-center p-3 border-b border-gray-100 rounded-t-xl shrink-0 
-                                                        ${isUsed ? 'bg-gray-200' : 'bg-gradient-to-r from-gray-50 to-white'}`}>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Variasi #{index + 1}</span>
-                                                            {isUsed && (
-                                                                <span className="text-[10px] bg-gray-600 text-white px-1.5 py-0.5 rounded font-medium">Sudah Dipakai</span>
-                                                            )}
-                                                        </div>
-                                                        <span className={`text-xs font-mono font-bold px-2 py-0.5 border rounded ${isUsed ? 'text-gray-500 bg-gray-100 border-gray-300' : 'text-blue-600 bg-blue-50 border-blue-100'}`}>ID: {item.id}</span>
-                                                    </div>
-
-                                                    {/* Konten Teks */}
-                                                    <div className="p-3">
-                                                        <p className={`font-mono text-xs whitespace-pre-wrap line-clamp-6 ${isUsed ? 'text-gray-500' : 'text-gray-600'}`}>
-                                                            {fullText}
-                                                        </p>
-                                                    </div>
-
-                                                    {/* Tombol Copy */}
-                                                    <div className={`p-3 border-t border-gray-100 rounded-b-xl shrink-0 ${isUsed ? 'bg-gray-200' : 'bg-gray-50'}`}>
-                                                        <button 
-                                                            onClick={() => handleCopy(fullText, index)}
-                                                            className={`w-full py-2 px-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 ${
-                                                                isCopied 
-                                                                ? 'bg-green-500 text-white shadow-md transform scale-[1.01]' 
-                                                                : isUsed
-                                                                    ? 'bg-gray-400 text-white hover:bg-gray-500' 
-                                                                    : 'bg-gray-800 hover:bg-gray-900 text-white shadow-sm hover:shadow'
-                                                            }`}
-                                                        >
-                                                            {isCopied ? (
-                                                                <span className="flex items-center justify-center gap-2"><IconCheck /> Tersalin!</span>
-                                                            ) : (
-                                                                <span className="flex items-center justify-center gap-2"><IconCopy /> {isUsed ? 'Copy Lagi' : 'Copy Text'}</span>
-                                                            )}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                    
-                                    {items.length > 0 && (
-                                        <div className="text-center py-4 text-gray-400 text-xs italic">
-                                            Scroll terus untuk variasi lainnya...
-                                        </div>
-                                    )}
+                        {/* RIGHT: RESULTS */}
+                        <div className="md:col-span-7 flex flex-col bg-gray-50 h-full overflow-hidden relative">
+                            {/* Result Header */}
+                            <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center shrink-0 z-10 shadow-sm">
+                                <div className="flex items-center gap-2">
+                                    <span className="bg-green-100 text-green-700 p-1.5 rounded-md"><Icon path={paths.infinity} /></span>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-800">Hasil Variasi</h3>
+                                        <p className="text-[10px] text-gray-400">Scroll untuk load lebih banyak</p>
+                                    </div>
                                 </div>
+                                <button onClick={resetItems} className="text-xs text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded border border-blue-200 transition">
+                                    <Icon path={paths.refresh} /> Reset
+                                </button>
                             </div>
 
+                            {/* List Container */}
+                            <div 
+                                className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar scroll-smooth"
+                                onScroll={handleScroll}
+                            >
+                                {items.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
+                                        <Icon path={paths.wand} />
+                                        <p className="mt-2 text-sm">Klik Generate untuk memulai</p>
+                                    </div>
+                                ) : (
+                                    items.map((item, index) => {
+                                        // DIEDIT: Mengubah \n\n menjadi \n agar rapat pada bagian ID
+                                        const fullText = `${item.text}\n_ID: ${item.id}_`;
+                                        const isCopied = copiedIndex === index;
+                                        const isUsed = usedIndices.includes(index);
+
+                                        return (
+                                            <div key={index} className={`bg-white border rounded-xl shadow-sm transition-all hover:shadow-md ${isCopied ? 'ring-2 ring-green-400 border-green-400' : 'border-gray-200'}`}>
+                                                {/* Card Header */}
+                                                <div className={`px-4 py-2 border-b flex justify-between items-center text-xs rounded-t-xl ${isUsed ? 'bg-gray-100' : 'bg-gray-50'}`}>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-gray-500">#{index + 1}</span>
+                                                        {isUsed && <span className="bg-gray-600 text-white px-1.5 py-0.5 rounded-[3px]">Terpakai</span>}
+                                                    </div>
+                                                    <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                                                        {item.id}
+                                                    </span>
+                                                </div>
+
+                                                {/* Text Content */}
+                                                <div className="p-4">
+                                                    <p className={`font-mono text-xs whitespace-pre-wrap leading-relaxed ${isUsed ? 'text-gray-400' : 'text-gray-700'}`}>
+                                                        {fullText}
+                                                    </p>
+                                                </div>
+
+                                                {/* Action Buttons */}
+                                                <div className="px-4 py-3 bg-gray-50 rounded-b-xl border-t border-gray-100 flex gap-2">
+                                                    <button 
+                                                        onClick={() => copyText(fullText, index)}
+                                                        className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${isCopied ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                                                    >
+                                                        {isCopied ? <><Icon path={paths.check} /> Tersalin</> : <><Icon path={paths.copy} /> Copy</>}
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => openWA(fullText)}
+                                                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition"
+                                                        title="Kirim ke WhatsApp"
+                                                    >
+                                                        <Icon path={paths.wa} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                )}
+                                
+                                {items.length > 0 && (
+                                    <div className="text-center py-6">
+                                        <span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></span>
+                                        <p className="text-[10px] text-gray-400 mt-1">Memuat lebih banyak...</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
