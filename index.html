@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Generator Caption Ultimate</title>
     
     <!-- Tailwind CSS -->
@@ -16,26 +16,30 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-        body { overscroll-behavior: none; }
+        
+        /* Fix untuk tinggi layar mobile modern */
+        .h-dvh { height: 100dvh; }
+        
+        body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
         
         /* Animasi halus */
         .fade-enter { opacity: 0; transform: translateY(10px); }
         .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 300ms, transform 300ms; }
     </style>
 </head>
-<body class="bg-gray-100 h-screen overflow-hidden text-gray-800 font-sans">
+<body class="bg-gray-100 h-dvh overflow-hidden text-gray-800 font-sans">
     <div id="root" class="h-full"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // --- ICONS ---
-        const Icon = ({ path }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
+        const Icon = ({ path, size = 16 }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
                 {path}
             </svg>
         );
@@ -50,7 +54,9 @@
             wa: <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />,
             download: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>,
             settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>,
-            hash: <><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></>
+            hash: <><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></>,
+            edit: <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>,
+            list: <><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></>
         };
 
         // --- DATABASE TEMPLATES ---
@@ -107,7 +113,6 @@
             const words = keywords.split(',').map(w => w.trim()).filter(w => w);
             const baseTags = words.map(w => `#${w.replace(/\s+/g, '')}`).join(' ');
             const genericTags = " #fyp #viral #rekomendasi #jualbelionline";
-            // DIEDIT: Menggunakan \n (satu baris) agar rapat
             return `\n${baseTags}${genericTags}`;
         };
 
@@ -115,6 +120,7 @@
         function CaptionGenerator() {
             // -- STATE --
             const [activeTab, setActiveTab] = useState('manual');
+            const [mobileView, setMobileView] = useState('input'); // 'input' | 'results'
             const [selectedCategory, setSelectedCategory] = useState('gadget');
             const [captionInput, setCaptionInput] = useState('');
             
@@ -130,7 +136,7 @@
             // ID Settings
             const [idSettings, setIdSettings] = useState({
                 prefix: '',
-                mode: 'random', // 'random' or 'sequential'
+                mode: 'random',
                 startSeq: 1
             });
 
@@ -141,7 +147,6 @@
 
             // -- EFFECTS --
 
-            // 1. Load Data from LocalStorage on Mount
             useEffect(() => {
                 const savedData = localStorage.getItem('captionGenData_v2');
                 if (savedData) {
@@ -153,7 +158,6 @@
                 }
             }, []);
 
-            // 2. Save Data to LocalStorage on Change
             useEffect(() => {
                 const dataToSave = {
                     autoForm,
@@ -164,34 +168,17 @@
                 localStorage.setItem('captionGenData_v2', JSON.stringify(dataToSave));
             }, [autoForm, hashtags, idSettings, selectedCategory]);
 
-            // 3. Construct Caption for Auto Mode
             useEffect(() => {
                 if (activeTab === 'auto') {
                     const template = CATEGORY_TEMPLATES[selectedCategory];
                     const tagString = generateHashtags(hashtags);
                     
-                    // DIEDIT: Logika baru untuk spasi sesuai request user
-                    // "yang di kasi jarak hanya pada Jarak setelah Kondisi (sebelum Harga). yang lain ndak ada baris kosong"
                     let caption = "";
-
-                    // 1. Opening (Enter 1x -> Rapat)
                     caption += template.opening + "\n";
-
-                    // 2. Nama Produk (Enter 1x -> Rapat)
                     caption += (autoForm.productName || "[Nama Produk]") + "\n";
-
-                    // 3. Deskripsi & Kondisi
-                    if (autoForm.description) {
-                        caption += autoForm.description + "\n";
-                    }
-                    
-                    // Kondisi -> (Enter 2x -> Ada Baris Kosong)
+                    if (autoForm.description) caption += autoForm.description + "\n";
                     caption += template.conditions + "\n\n";
-
-                    // 4. Harga (Enter 1x -> Rapat)
                     caption += `${template.priceLabel} : Rp.${autoForm.price || "..."}\n`;
-
-                    // 5. Link + Hashtag (Rapat)
                     caption += `${template.linkLabel || "Link/Kontak"} : ${autoForm.link || "..."}${tagString}`;
 
                     setCaptionInput(caption);
@@ -243,6 +230,8 @@
                 const initialItems = generateBatch(4, captionInput); 
                 setItems(initialItems);
                 setUsedIndices([]);
+                // Switch to results tab on mobile after generating
+                setMobileView('results');
             };
 
             const loadMoreItems = () => {
@@ -257,7 +246,6 @@
                 }
             };
 
-            // Actions
             const copyText = (text, index) => {
                 try {
                     const textArea = document.createElement("textarea");
@@ -268,7 +256,6 @@
                     document.body.appendChild(textArea);
                     textArea.focus();
                     textArea.select();
-                    
                     const successful = document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
@@ -276,12 +263,6 @@
                         setCopiedIndex(index);
                         setTimeout(() => setCopiedIndex(null), 2000);
                         if (!usedIndices.includes(index)) setUsedIndices(prev => [...prev, index]);
-                    } else {
-                        navigator.clipboard.writeText(text).then(() => {
-                            setCopiedIndex(index);
-                            setTimeout(() => setCopiedIndex(null), 2000);
-                            if (!usedIndices.includes(index)) setUsedIndices(prev => [...prev, index]);
-                        }).catch(e => console.error("Clipboard failed", e));
                     }
                 } catch (err) {
                     console.error('Copy error:', err);
@@ -295,15 +276,12 @@
 
             const exportCSV = () => {
                 if (items.length === 0) return alert("Generate dulu captionnya!");
-                
                 const exportBatch = generateBatch(50, captionInput);
-                
                 let csvContent = "data:text/csv;charset=utf-8,ID,Caption\n";
                 exportBatch.forEach(row => {
                     const safeText = row.text.replace(/"/g, '""'); 
                     csvContent += `${row.id},"${safeText}"\n`;
                 });
-
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
@@ -313,38 +291,70 @@
             };
 
             return (
-                <div className="h-screen flex flex-col overflow-hidden">
+                <div className="h-dvh flex flex-col overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-700 to-blue-600 p-4 text-white shadow-md shrink-0 z-20">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
-                            <div>
-                                <h1 className="text-xl font-bold flex items-center gap-2">
-                                    <Icon path={paths.bag} /> Generator Caption Ultimate
+                    <div className="bg-gradient-to-r from-blue-700 to-blue-600 p-3 md:p-4 text-white shadow-md shrink-0 z-20">
+                        <div className="max-w-7xl mx-auto flex flex-row justify-between items-center gap-2">
+                            <div className="flex flex-col">
+                                <h1 className="text-lg md:text-xl font-bold flex items-center gap-2">
+                                    <Icon path={paths.bag} /> <span className="hidden md:inline">Generator Caption Ultimate</span><span className="md:hidden">Caption Generator</span>
                                 </h1>
-                                <p className="text-blue-100 text-xs hidden md:block">Tool jualan lengkap dengan Spintax, WhatsApp, & Export Excel</p>
+                                <p className="text-blue-100 text-[10px] hidden md:block">Tool jualan lengkap dengan Spintax, WhatsApp, & Export Excel</p>
                             </div>
                             <div className="flex gap-2">
                                 <button onClick={exportCSV} className="bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow transition">
-                                    <Icon path={paths.download} /> Export Excel
+                                    <Icon path={paths.download} /> <span className="hidden md:inline">Export Excel</span><span className="md:hidden">CSV</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex-grow grid grid-cols-1 md:grid-cols-12 overflow-hidden max-w-7xl mx-auto w-full">
+                    {/* Mobile Navigation Tabs (Only visible on small screens) */}
+                    <div className="md:hidden flex bg-white border-b border-gray-200 shrink-0">
+                        <button 
+                            onClick={() => setMobileView('input')}
+                            className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition ${mobileView === 'input' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+                        >
+                            <Icon path={paths.edit} /> Input Data
+                        </button>
+                        <button 
+                            onClick={() => setMobileView('results')}
+                            className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition relative ${mobileView === 'results' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500'}`}
+                        >
+                            <Icon path={paths.list} /> Hasil Generate
+                            {items.length > 0 && <span className="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full"></span>}
+                        </button>
+                    </div>
+
+                    <div className="flex-grow grid grid-cols-1 md:grid-cols-12 overflow-hidden max-w-7xl mx-auto w-full h-full relative">
                         
-                        {/* LEFT: INPUT & SETTINGS */}
-                        <div className="md:col-span-5 flex flex-col bg-white border-r border-gray-200 z-10 h-full overflow-hidden">
-                            
-                            {/* Tabs & Config */}
-                            <div className="p-4 bg-gray-50 border-b border-gray-200 overflow-y-auto custom-scrollbar" style={{maxHeight: '40%'}}>
-                                {/* Kategori Dropdown */}
-                                <div className="mb-4">
+                        {/* LEFT COLUMN: SINGLE SCROLLABLE AREA */}
+                        <div className={`md:col-span-5 bg-white border-r border-gray-200 z-10 h-full overflow-y-auto custom-scrollbar ${mobileView === 'input' ? 'block' : 'hidden md:block'}`}>
+                            <div className="p-4 space-y-4 pb-24 md:pb-20">
+                                
+                                {/* 1. MODE SWITCHER */}
+                                <div className="flex bg-gray-100 p-1 rounded-lg">
+                                    <button 
+                                        onClick={() => setActiveTab('manual')}
+                                        className={`flex-1 py-2 text-sm font-bold rounded-md transition ${activeTab === 'manual' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >
+                                        Manual Input
+                                    </button>
+                                    <button 
+                                        onClick={() => setActiveTab('auto')}
+                                        className={`flex-1 py-2 text-sm font-bold rounded-md transition ${activeTab === 'auto' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >
+                                        Otomatis
+                                    </button>
+                                </div>
+
+                                {/* 2. KATEGORI DROPDOWN */}
+                                <div>
                                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Kategori Produk</label>
                                     <select 
                                         value={selectedCategory}
                                         onChange={(e) => setSelectedCategory(e.target.value)}
-                                        className="w-full p-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-3 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
                                     >
                                         {Object.keys(CATEGORY_TEMPLATES).map(key => (
                                             <option key={key} value={key}>{CATEGORY_TEMPLATES[key].label}</option>
@@ -352,34 +362,118 @@
                                     </select>
                                 </div>
 
-                                {/* ID Settings */}
-                                <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                    <div className="flex items-center gap-2 mb-2 text-gray-700 font-bold text-xs uppercase">
+                                {/* 3. INPUT AREA */}
+                                <div className="bg-white rounded-lg">
+                                    {activeTab === 'manual' ? (
+                                        <textarea 
+                                            className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none h-64"
+                                            placeholder={`Paste caption Spintax disini...\nContoh: {Jual|Ready} Barang {Bagus|Murah}`}
+                                            value={captionInput}
+                                            onChange={(e) => setCaptionInput(e.target.value)}
+                                        />
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-600">Nama Produk</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full p-3 border rounded-lg focus:ring-1 focus:ring-blue-500"
+                                                    placeholder={CATEGORY_TEMPLATES[selectedCategory].placeholder}
+                                                    value={autoForm.productName}
+                                                    onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-600">Deskripsi Tambahan (Opsional)</label>
+                                                <textarea 
+                                                    rows="2"
+                                                    className="w-full p-3 border rounded-lg focus:ring-1 focus:ring-blue-500 text-sm"
+                                                    placeholder="Warna merah, size L..."
+                                                    value={autoForm.description}
+                                                    onChange={(e) => setAutoForm({...autoForm, description: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-600">Harga</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="w-full p-3 border rounded-lg"
+                                                        placeholder="150.000"
+                                                        value={autoForm.price}
+                                                        onChange={(e) => setAutoForm({...autoForm, price: e.target.value})}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-600">Link / Kontak</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="w-full p-3 border rounded-lg"
+                                                        placeholder="shopee.co.id/..."
+                                                        value={autoForm.link}
+                                                        onChange={(e) => setAutoForm({...autoForm, link: e.target.value})}
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Hashtag */}
+                                            <div className="pt-2 border-t border-dashed">
+                                                <label className="text-xs font-bold text-gray-600 flex items-center gap-1 mb-1">
+                                                    <Icon path={paths.hash} /> Hashtag (Pisahkan dengan koma)
+                                                </label>
+                                                <input 
+                                                    type="text"
+                                                    className="w-full p-3 border rounded-lg bg-gray-50 text-sm"
+                                                    placeholder="sepatu, murah, promo"
+                                                    value={hashtags}
+                                                    onChange={(e) => setHashtags(e.target.value)}
+                                                />
+                                                <p className="text-[10px] text-gray-400 mt-1">Otomatis ditambah: #fyp #viral #rekomendasi</p>
+                                            </div>
+
+                                            {/* Preview Box */}
+                                            <div className="p-3 bg-yellow-50 border border-yellow-100 rounded-lg text-[10px] text-gray-600 font-mono h-24 overflow-y-auto">
+                                                <span className="font-bold text-yellow-700 block mb-1">Preview Raw Spintax:</span>
+                                                {captionInput || "..."}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 4. ID SETTINGS (Di Bawah Input) */}
+                                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="flex items-center gap-2 mb-3 text-gray-700 font-bold text-xs uppercase">
                                         <Icon path={paths.settings} /> Pengaturan ID Unik
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Prefix (opsional)" 
-                                            className="p-2 border rounded text-xs"
-                                            value={idSettings.prefix}
-                                            onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})}
-                                        />
-                                        <select 
-                                            className="p-2 border rounded text-xs"
-                                            value={idSettings.mode}
-                                            onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}
-                                        >
-                                            <option value="random">Acak (Random)</option>
-                                            <option value="sequential">Urut (001, 002)</option>
-                                        </select>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-gray-500 block mb-1">Prefix (Opsional)</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Contoh: TOKO-" 
+                                                className="w-full p-2 border rounded-md text-xs bg-white"
+                                                value={idSettings.prefix}
+                                                onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-gray-500 block mb-1">Mode ID</label>
+                                            <select 
+                                                className="w-full p-2 border rounded-md text-xs bg-white"
+                                                value={idSettings.mode}
+                                                onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}
+                                            >
+                                                <option value="random">Acak (Random)</option>
+                                                <option value="sequential">Urut (001, 002)</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     {idSettings.mode === 'sequential' && (
                                         <div className="mt-2 flex items-center gap-2">
                                             <label className="text-xs text-gray-500">Mulai dari:</label>
                                             <input 
                                                 type="number" 
-                                                className="p-1 border rounded w-20 text-xs"
+                                                className="p-1 border rounded w-20 text-xs bg-white"
                                                 value={idSettings.startSeq}
                                                 onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})}
                                             />
@@ -387,116 +481,19 @@
                                     )}
                                 </div>
 
-                                {/* Mode Switcher */}
-                                <div className="flex bg-gray-200 p-1 rounded-lg">
-                                    <button 
-                                        onClick={() => setActiveTab('manual')}
-                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md transition ${activeTab === 'manual' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'}`}
-                                    >
-                                        Manual Input
-                                    </button>
-                                    <button 
-                                        onClick={() => setActiveTab('auto')}
-                                        className={`flex-1 py-1.5 text-xs font-bold rounded-md transition ${activeTab === 'auto' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'}`}
-                                    >
-                                        Otomatis
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Main Input Area */}
-                            <div className="flex-grow p-4 overflow-y-auto custom-scrollbar">
-                                {activeTab === 'manual' ? (
-                                    <div className="h-full flex flex-col">
-                                        <textarea 
-                                            className="flex-grow w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none"
-                                            placeholder={`Paste caption Spintax disini...\nContoh: {Jual|Ready} Barang {Bagus|Murah}`}
-                                            value={captionInput}
-                                            onChange={(e) => setCaptionInput(e.target.value)}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="space-y-3 pb-20">
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-600">Nama Produk</label>
-                                            <input 
-                                                type="text" 
-                                                className="w-full p-2 border rounded focus:ring-1 focus:ring-blue-500"
-                                                placeholder={CATEGORY_TEMPLATES[selectedCategory].placeholder}
-                                                value={autoForm.productName}
-                                                onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-600">Deskripsi Tambahan (Opsional)</label>
-                                            <textarea 
-                                                rows="2"
-                                                className="w-full p-2 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
-                                                placeholder="Warna merah, size L..."
-                                                value={autoForm.description}
-                                                onChange={(e) => setAutoForm({...autoForm, description: e.target.value})}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-600">Harga</label>
-                                                <input 
-                                                    type="text" 
-                                                    className="w-full p-2 border rounded"
-                                                    placeholder="150.000"
-                                                    value={autoForm.price}
-                                                    onChange={(e) => setAutoForm({...autoForm, price: e.target.value})}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-600">Link / Kontak</label>
-                                                <input 
-                                                    type="text" 
-                                                    className="w-full p-2 border rounded"
-                                                    placeholder="shopee.co.id/..."
-                                                    value={autoForm.link}
-                                                    onChange={(e) => setAutoForm({...autoForm, link: e.target.value})}
-                                                />
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Hashtag Builder */}
-                                        <div className="pt-2 border-t border-dashed">
-                                            <label className="text-xs font-bold text-gray-600 flex items-center gap-1">
-                                                <Icon path={paths.hash} /> Hashtag (Pisahkan dengan koma)
-                                            </label>
-                                            <input 
-                                                type="text"
-                                                className="w-full p-2 border rounded bg-gray-50 text-sm"
-                                                placeholder="sepatu, murah, promo"
-                                                value={hashtags}
-                                                onChange={(e) => setHashtags(e.target.value)}
-                                            />
-                                            <p className="text-[10px] text-gray-400 mt-1">Otomatis ditambah: #fyp #viral #rekomendasi</p>
-                                        </div>
-
-                                        {/* Preview Box */}
-                                        <div className="p-2 bg-yellow-50 border border-yellow-100 rounded text-[10px] text-gray-600 font-mono h-20 overflow-y-auto">
-                                            <span className="font-bold text-yellow-700 block mb-1">Preview Raw Spintax:</span>
-                                            {captionInput || "..."}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Generate Button (Sticky Bottom Left) */}
-                            <div className="p-4 bg-white border-t border-gray-200">
+                                {/* 5. GENERATE BUTTON (Paling Bawah) */}
                                 <button 
                                     onClick={resetItems}
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition mb-8"
                                 >
                                     <Icon path={paths.wand} /> GENERATE HASIL
                                 </button>
+
                             </div>
                         </div>
 
-                        {/* RIGHT: RESULTS */}
-                        <div className="md:col-span-7 flex flex-col bg-gray-50 h-full overflow-hidden relative">
+                        {/* RIGHT COLUMN: RESULTS */}
+                        <div className={`md:col-span-7 flex flex-col bg-gray-50 h-full overflow-hidden relative ${mobileView === 'results' ? 'block' : 'hidden md:flex'}`}>
                             {/* Result Header */}
                             <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center shrink-0 z-10 shadow-sm">
                                 <div className="flex items-center gap-2">
@@ -506,8 +503,8 @@
                                         <p className="text-[10px] text-gray-400">Scroll untuk load lebih banyak</p>
                                     </div>
                                 </div>
-                                <button onClick={resetItems} className="text-xs text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded border border-blue-200 transition">
-                                    <Icon path={paths.refresh} /> Reset
+                                <button onClick={resetItems} className="text-xs text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded border border-blue-200 transition flex items-center gap-1">
+                                    <Icon path={paths.refresh} /> <span className="hidden md:inline">Reset</span>
                                 </button>
                             </div>
 
@@ -517,13 +514,13 @@
                                 onScroll={handleScroll}
                             >
                                 {items.length === 0 ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
-                                        <Icon path={paths.wand} />
-                                        <p className="mt-2 text-sm">Klik Generate untuk memulai</p>
+                                    <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-60 p-8 text-center">
+                                        <Icon path={paths.wand} size={48} />
+                                        <p className="mt-4 text-sm font-medium">Belum ada hasil.</p>
+                                        <p className="text-xs mt-1">Masuk ke tab <b>Input Data</b> lalu klik <b>Generate</b>.</p>
                                     </div>
                                 ) : (
                                     items.map((item, index) => {
-                                        // DIEDIT: Mengubah \n\n menjadi \n agar rapat pada bagian ID
                                         const fullText = `${item.text}\n_ID: ${item.id}_`;
                                         const isCopied = copiedIndex === index;
                                         const isUsed = usedIndices.includes(index);
@@ -552,7 +549,7 @@
                                                 <div className="px-4 py-3 bg-gray-50 rounded-b-xl border-t border-gray-100 flex gap-2">
                                                     <button 
                                                         onClick={() => copyText(fullText, index)}
-                                                        className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${isCopied ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                                                        className={`flex-1 py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${isCopied ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                                                     >
                                                         {isCopied ? <><Icon path={paths.check} /> Tersalin</> : <><Icon path={paths.copy} /> Copy</>}
                                                     </button>
@@ -570,7 +567,7 @@
                                 )}
                                 
                                 {items.length > 0 && (
-                                    <div className="text-center py-6">
+                                    <div className="text-center py-6 pb-20 md:pb-6">
                                         <span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></span>
                                         <p className="text-[10px] text-gray-400 mt-1">Memuat lebih banyak...</p>
                                     </div>
