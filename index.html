@@ -73,17 +73,16 @@
             hash: <><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></>,
             edit: <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>,
             list: <><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></>,
-            trash: <><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></>,
-            copyAll: <><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></>,
             moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,
-            sun: <><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>
+            sun: <><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,
+            arrowRight: <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>
         };
 
         const CATEGORY_TEMPLATES = {
-            gadget: { label: "Gadget & Elektronik", opening: "{izin posting min|izin share min|izin lapak min|permisi posting min|numpang posting min|ijin posting admin}", conditions: "{baru|new|kondisi baru|fresh unit|belum pernah dipakai} {fullset|lengkap|kelengkapan lengkap|set lengkap}, {segel|masih segel|segel pabrik}, {garansi|bergaransi|jaminan} {resmi|official}", priceLabel: "{harga murah|harga terjangkau|best price|harga promo|harga spesial}", linkLabel: "{link pembelian|link beli|link checkout|link order|tautan pembelian|tautan beli|link pemesanan|link transaksi}", placeholder: "Contoh: Sony A6000 Kit" },
-            fashion: { label: "Fashion & Baju", opening: "{Ready Stock|Hadir Lagi|New Arrival|Restock Sist|Koleksi Baru}", conditions: "{Bahan adem|Kualitas premium|Jahitan rapi|Nyaman dipakai} {All Size|Ukuran Lengkap|Tersedia M/L/XL}, {Warna cantik|Pilihan warna banyak}, {Real pict|Foto asli|Sesuai gambar}", priceLabel: "{Harga promo|Diskon khusus|Harga cantik|Murah meriah}", linkLabel: "{link pembelian|link beli|link checkout|link order|tautan pembelian|tautan beli|link pemesanan|link transaksi}", placeholder: "Contoh: Gamis Rayon Premium" },
-            food: { label: "Makanan & Kuliner", opening: "{Open PO|Ready Hari Ini|Siap Antar|Fresh from Oven|Menu Baru}", conditions: "{Enak|Lezat|Gurih|Nikmat|Bikin nagih} {Tanpa pengawet|Bahan alami|100% Halal|Higienis}, {Made by order|Freshly made|Masih hangat}, {Bisa COD|Siap delivery}", priceLabel: "{Harga hemat|Paket hemat|Murah banget|Cuma}", linkLabel: "{link pembelian|link beli|link checkout|link order|tautan pembelian|tautan beli|link pemesanan|link transaksi}", placeholder: "Contoh: Sambal Cumi Pete" },
-            services: { label: "Jasa & Layanan", opening: "{Open Jasa|Melayani|Siap Membantu|Butuh Bantuan?|Solusi Tepat}", conditions: "{Profesional|Berpengalaman|Terpercaya|Amanah}, {Pengerjaan cepat|Hasil rapi|On time}, {Free konsultasi|Garansi revisi|Layanan 24 jam}", priceLabel: "{Biaya terjangkau|Rate bersahabat|Harga nego|Mulai dari}", linkLabel: "{link pembelian|link beli|link checkout|link order|tautan pembelian|tautan beli|link pemesanan|link transaksi}", placeholder: "Contoh: Jasa Desain Logo" }
+            gadget: { label: "Gadget & Elektronik", opening: "{izin posting min|izin share min|izin lapak min|permisi posting min|numpang posting min|ijin posting admin}", conditions: "{baru|new|kondisi baru|fresh unit|belum pernah dipakai} {fullset|lengkap|kelengkapan lengkap|set lengkap}, {segel|masih segel|segel pabrik}, {garansi|bergaransi|jaminan} {resmi|official}", priceLabel: "{harga murah|harga terjangkau|best price|harga promo|harga spesial}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Sony A6000 Kit" },
+            fashion: { label: "Fashion & Baju", opening: "{Ready Stock|Hadir Lagi|New Arrival|Restock Sist|Koleksi Baru}", conditions: "{Bahan adem|Kualitas premium|Jahitan rapi|Nyaman dipakai} {All Size|Ukuran Lengkap|Tersedia M/L/XL}, {Warna cantik|Pilihan warna banyak}, {Real pict|Foto asli|Sesuai gambar}", priceLabel: "{Harga promo|Diskon khusus|Harga cantik|Murah meriah}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Gamis Rayon Premium" },
+            food: { label: "Makanan & Kuliner", opening: "{Open PO|Ready Hari Ini|Siap Antar|Fresh from Oven|Menu Baru}", conditions: "{Enak|Lezat|Gurih|Nikmat|Bikin nagih} {Tanpa pengawet|Bahan alami|100% Halal|Higienis}, {Made by order|Freshly made|Masih hangat}, {Bisa COD|Siap delivery}", priceLabel: "{Harga hemat|Paket hemat|Murah banget|Cuma}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Sambal Cumi Pete" },
+            services: { label: "Jasa & Layanan", opening: "{Open Jasa|Melayani|Siap Membantu|Butuh Bantuan?|Solusi Tepat}", conditions: "{Profesional|Berpengalaman|Terpercaya|Amanah}, {Pengerjaan cepat|Hasil rapi|On time}, {Free konsultasi|Garansi revisi|Layanan 24 jam}", priceLabel: "{Biaya terjangkau|Rate bersahabat|Harga nego|Mulai dari}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Jasa Desain Logo" }
         };
 
         const processSpintax = (text) => {
@@ -118,16 +117,14 @@
             const [hashtags, setHashtags] = useState('');
             const [idSettings, setIdSettings] = useState({ prefix: '', mode: 'random', startSeq: 1 });
 
-            // RESULTS with Persistence Logic
-            const [items, setItems] = useState([]);
-            const [copiedIndex, setCopiedIndex] = useState(null);
-            const [usedIndices, setUsedIndices] = useState([]);
+            // UBAHAN UTAMA: State untuk satu hasil saja
+            const [currentItem, setCurrentItem] = useState(null);
+            const [isCopied, setIsCopied] = useState(false);
 
             // -- EFFECTS --
 
-            // 1. Initial Load
             useEffect(() => {
-                const savedData = localStorage.getItem('captionGenData_v3');
+                const savedData = localStorage.getItem('captionGenData_v4');
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
                     setAutoForm(parsed.autoForm || { productName: '', price: '', link: '', description: '' });
@@ -135,24 +132,21 @@
                     setIdSettings(parsed.idSettings || { prefix: '', mode: 'random', startSeq: 1 });
                     setSelectedCategory(parsed.selectedCategory || 'gadget');
                     setDarkMode(parsed.darkMode || false);
-                    if(parsed.items) setItems(parsed.items); // Restore generated items
+                    if(parsed.currentItem) setCurrentItem(parsed.currentItem);
                 }
             }, []);
 
-            // 2. Save Data on Change
             useEffect(() => {
                 const dataToSave = {
-                    autoForm, hashtags, idSettings, selectedCategory, darkMode, items // Save items too
+                    autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem
                 };
-                localStorage.setItem('captionGenData_v3', JSON.stringify(dataToSave));
+                localStorage.setItem('captionGenData_v4', JSON.stringify(dataToSave));
                 
-                // Toggle Dark Mode Class
                 if (darkMode) document.documentElement.classList.add('dark');
                 else document.documentElement.classList.remove('dark');
                 
-            }, [autoForm, hashtags, idSettings, selectedCategory, darkMode, items]);
+            }, [autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem]);
 
-            // 3. Construct Caption Live
             useEffect(() => {
                 if (activeTab === 'auto') {
                     const template = CATEGORY_TEMPLATES[selectedCategory];
@@ -164,7 +158,7 @@
                     if (autoForm.description) caption += autoForm.description + "\n";
                     caption += template.conditions + "\n\n";
                     caption += `${template.priceLabel} : Rp.${autoForm.price || "..."}\n`;
-                    caption += `${template.linkLabel || "Link/Kontak"} : ${autoForm.link || "..."}${tagString}`;
+                    caption += `${template.linkLabel || "Link/Kontak :"} ${autoForm.link || "..."}${tagString}`;
 
                     setCaptionInput(caption);
                 }
@@ -172,12 +166,11 @@
 
             // -- FUNCTIONS --
 
-            const generateID = (indexForSeq) => {
+            const generateID = () => {
                 const { prefix, mode, startSeq } = idSettings;
                 let idBody = "";
                 if (mode === 'sequential') {
-                    const currentSeq = parseInt(startSeq) + items.length + indexForSeq;
-                    idBody = currentSeq.toString().padStart(4, '0');
+                    idBody = startSeq.toString().padStart(4, '0');
                 } else {
                     const min = 10000;
                     const max = 99999;
@@ -186,90 +179,73 @@
                 return prefix ? `${prefix}-${idBody}` : idBody;
             };
 
-            const generateBatch = (count, inputText) => {
-                const newItems = [];
-                for (let i = 0; i < count; i++) {
-                    const newId = generateID(i);
-                    const processedText = processSpintax(inputText);
-                    newItems.push({ id: newId, text: processedText });
+            const generateNewResult = () => {
+                if (!captionInput.trim()) {
+                    alert("Harap isi caption terlebih dahulu!");
+                    return;
                 }
+                
+                const newId = generateID();
+                const processedText = processSpintax(captionInput);
+                
+                setCurrentItem({ id: newId, text: processedText });
+                
+                // Update counter if sequential
                 if (idSettings.mode === 'sequential') {
-                    setIdSettings(prev => ({ ...prev, startSeq: parseInt(prev.startSeq) + count }));
+                    setIdSettings(prev => ({ ...prev, startSeq: parseInt(prev.startSeq) + 1 }));
                 }
-                return newItems;
-            };
-
-            const resetItems = () => {
-                if (items.length > 0) {
-                    if (!confirm("Hapus semua hasil dan generate baru?")) return;
-                }
-                const initialItems = generateBatch(4, captionInput); 
-                setItems(initialItems);
-                setUsedIndices([]);
+                
                 setMobileView('results');
             };
 
-            const loadMoreItems = () => {
-                const moreItems = generateBatch(5, captionInput);
-                setItems(prev => [...prev, ...moreItems]);
-            };
-
-            const handleScroll = (e) => {
-                const { scrollTop, scrollHeight, clientHeight } = e.target;
-                if (scrollTop + clientHeight >= scrollHeight - 50) {
-                    loadMoreItems();
-                }
-            };
-
-            const copyText = (text, index) => {
+            const handleCopy = () => {
+                if (!currentItem) return;
+                
+                const fullText = `${currentItem.text}\n_ID: ${currentItem.id}_`;
+                
                 try {
                     const textArea = document.createElement("textarea");
-                    textArea.value = text;
+                    textArea.value = fullText;
                     textArea.style.position = "fixed";
                     textArea.style.left = "-9999px";
-                    textArea.style.top = "0";
                     document.body.appendChild(textArea);
-                    textArea.focus();
                     textArea.select();
                     const successful = document.execCommand('copy');
                     document.body.removeChild(textArea);
+                    
                     if (successful) {
-                        setCopiedIndex(index);
-                        setTimeout(() => setCopiedIndex(null), 2000);
-                        if (!usedIndices.includes(index)) setUsedIndices(prev => [...prev, index]);
+                        setIsCopied(true);
+                        // Delay 1 detik untuk tunjukkan label "Tersalin", lalu otomatis ganti baru
+                        setTimeout(() => {
+                            setIsCopied(false);
+                            generateNewResult();
+                        }, 1000);
                     }
                 } catch (err) { console.error(err); }
             };
 
-            const copyAllResults = () => {
-                if (items.length === 0) return;
-                const allText = items.map(item => `${item.text}\n_ID: ${item.id}_`).join('\n\n====================\n\n');
-                try {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = allText;
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-9999px";
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    alert("Semua caption tersalin!");
-                } catch(e) {}
+            const openWA = () => {
+                if (!currentItem) return;
+                const fullText = `${currentItem.text}\n_ID: ${currentItem.id}_`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
             };
 
-            const deleteItem = (indexToDelete) => setItems(prev => prev.filter((_, i) => i !== indexToDelete));
-            const updateItemText = (index, newText) => {
-                setItems(prev => {
-                    const newItems = [...prev];
-                    newItems[index].text = newText;
-                    return newItems;
-                });
-            };
-            const openWA = (text) => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             const exportCSV = () => {
-                if (items.length === 0) return alert("Generate dulu captionnya!");
+                if (!captionInput.trim()) return alert("Isi caption terlebih dahulu!");
+                
+                // Walaupun UI 1 per 1, fitur export tetap generate 50 sekaligus agar mudah
+                const exportBatch = [];
+                let currentSeq = parseInt(idSettings.startSeq);
+                
+                for(let i=0; i<50; i++) {
+                    let idBody = idSettings.mode === 'sequential' ? (currentSeq + i).toString().padStart(4, '0') : Math.floor(10000 + Math.random() * 89999).toString();
+                    let finalId = idSettings.prefix ? `${idSettings.prefix}-${idBody}` : idBody;
+                    let processedText = processSpintax(captionInput);
+                    exportBatch.push({ id: finalId, text: processedText });
+                }
+
                 let csvContent = "data:text/csv;charset=utf-8,ID,Caption\n";
-                items.forEach(row => { // Export CURRENT items instead of generating new ones
+                exportBatch.forEach(row => {
                     const safeText = row.text.replace(/"/g, '""'); 
                     csvContent += `${row.id},"${safeText}"\n`;
                 });
@@ -289,14 +265,14 @@
                                 <h1 className="text-lg md:text-xl font-bold flex items-center gap-2">
                                     <Icon path={paths.bag} /> <span className="hidden md:inline">Generator Caption Ultimate</span><span className="md:hidden">Caption Generator</span>
                                 </h1>
-                                <p className="text-blue-100 dark:text-gray-400 text-[10px] hidden md:block">Tool jualan lengkap dengan Spintax, WhatsApp, & Export Excel</p>
+                                <p className="text-blue-100 dark:text-gray-400 text-[10px] hidden md:block">Mode Satu-per-Satu | Copy langsung berganti otomatis</p>
                             </div>
                             <div className="flex gap-2 items-center">
                                 <button onClick={() => setDarkMode(!darkMode)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition" title={darkMode ? "Mode Terang" : "Mode Gelap"}>
                                     {darkMode ? <Icon path={paths.sun} /> : <Icon path={paths.moon} />}
                                 </button>
                                 <button onClick={exportCSV} className="bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 shadow transition">
-                                    <Icon path={paths.download} /> <span className="hidden md:inline">Export Excel</span><span className="md:hidden">CSV</span>
+                                    <Icon path={paths.download} /> <span className="hidden md:inline">Export 50 CSV</span><span className="md:hidden">CSV</span>
                                 </button>
                             </div>
                         </div>
@@ -308,14 +284,14 @@
                             <Icon path={paths.edit} /> Input Data
                         </button>
                         <button onClick={() => setMobileView('results')} className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition relative ${mobileView === 'results' ? 'border-green-600 text-green-600 dark:text-green-400' : 'border-transparent text-gray-500 dark:text-gray-400'}`}>
-                            <Icon path={paths.list} /> Hasil
-                            {items.length > 0 && <span className="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full"></span>}
+                            <Icon path={paths.list} /> Hasil Generate
+                            {currentItem && <span className="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full"></span>}
                         </button>
                     </div>
 
                     <div className="flex-grow grid grid-cols-1 md:grid-cols-12 overflow-hidden max-w-7xl mx-auto w-full h-full relative">
                         
-                        {/* LEFT COLUMN */}
+                        {/* LEFT COLUMN: INPUT */}
                         <div className={`md:col-span-5 bg-white dark:bg-dark-card border-r border-gray-200 dark:border-dark-border z-10 h-full overflow-y-auto custom-scrollbar ${mobileView === 'input' ? 'block' : 'hidden md:block'}`}>
                             <div className="p-4 space-y-4 pb-24 md:pb-20">
                                 <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
@@ -368,67 +344,85 @@
                                     {idSettings.mode === 'sequential' && (<div className="mt-2 flex items-center gap-2"><label className="text-xs text-gray-500 dark:text-gray-400">Mulai dari:</label><input type="number" className="p-1 border border-gray-300 dark:border-gray-600 rounded w-20 text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.startSeq} onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})} /></div>)}
                                 </div>
 
-                                <button onClick={resetItems} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition mb-8"><Icon path={paths.wand} /> GENERATE HASIL</button>
+                                <button onClick={generateNewResult} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition mb-8"><Icon path={paths.wand} /> MULAILAH (GENERATE)</button>
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN */}
+                        {/* RIGHT COLUMN: SINGLE RESULT */}
                         <div className={`md:col-span-7 flex flex-col bg-gray-50 dark:bg-dark-bg h-full overflow-hidden relative ${mobileView === 'results' ? 'block' : 'hidden md:flex'}`}>
+                            
                             <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card flex justify-between items-center shrink-0 z-10 shadow-sm">
                                 <div className="flex items-center gap-2">
-                                    <span className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 p-1.5 rounded-md"><Icon path={paths.infinity} /></span>
-                                    <div><h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">Hasil Variasi</h3><p className="text-[10px] text-gray-400">Total: {items.length} caption</p></div>
+                                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 p-1.5 rounded-md"><Icon path={paths.edit} /></span>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">Hasil Caption Anda</h3>
+                                        <p className="text-[10px] text-gray-400">Copy untuk mengganti otomatis</p>
+                                    </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button onClick={copyAllResults} className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 transition flex items-center gap-1 font-bold" title="Copy Semua Hasil">
-                                        <Icon path={paths.copyAll} /> <span className="hidden sm:inline">Copy All</span>
-                                    </button>
-                                    <button onClick={resetItems} className="text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded border border-blue-200 dark:border-blue-900 transition flex items-center gap-1">
-                                        <Icon path={paths.refresh} /> <span className="hidden sm:inline">Reset</span>
-                                    </button>
-                                </div>
+                                <button onClick={generateNewResult} className="text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded border border-blue-200 dark:border-blue-900 transition flex items-center gap-1">
+                                    <Icon path={paths.refresh} /> <span className="hidden sm:inline">Lewati / Ganti Baru</span>
+                                </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar scroll-smooth" onScroll={handleScroll}>
-                                {items.length === 0 ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 opacity-60 p-8 text-center">
-                                        <Icon path={paths.wand} size={48} /><p className="mt-4 text-sm font-medium">Belum ada hasil.</p><p className="text-xs mt-1">Masuk ke tab <b>Input Data</b> lalu klik <b>Generate</b>.</p>
+                            <div className="flex-1 overflow-y-auto p-4 md:p-8 flex items-start justify-center custom-scrollbar">
+                                {!currentItem ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 opacity-60 text-center">
+                                        <Icon path={paths.wand} size={48} />
+                                        <p className="mt-4 text-sm font-medium">Belum ada hasil.</p>
+                                        <p className="text-xs mt-1">Masuk ke tab <b>Input Data</b> lalu klik tombol <b>Mulailah</b>.</p>
                                     </div>
                                 ) : (
-                                    items.map((item, index) => {
-                                        const fullText = `${item.text}\n_ID: ${item.id}_`;
-                                        const isCopied = copiedIndex === index;
-                                        const isUsed = usedIndices.includes(index);
+                                    <div className="w-full max-w-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg transition-all flex flex-col animate-fade-in relative">
+                                        
+                                        {/* Status Header */}
+                                        <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-t-xl flex justify-between items-center">
+                                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Siap Digunakan
+                                            </span>
+                                            <span className="font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
+                                                ID: {currentItem.id}
+                                            </span>
+                                        </div>
 
-                                        return (
-                                            <div key={index} className={`bg-white dark:bg-dark-card border rounded-xl shadow-sm transition-all hover:shadow-md ${isCopied ? 'ring-2 ring-green-400 border-green-400' : 'border-gray-200 dark:border-gray-700'}`}>
-                                                <div className={`px-4 py-2 border-b flex justify-between items-center text-xs rounded-t-xl ${isUsed ? 'bg-gray-100 dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-800/50'} dark:border-gray-700`}>
-                                                    <div className="flex items-center gap-2"><span className="font-bold text-gray-500 dark:text-gray-400">#{index + 1}</span>{isUsed && <span className="bg-gray-600 text-white px-1.5 py-0.5 rounded-[3px]">Terpakai</span>}</div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">{item.id}</span>
-                                                        <button onClick={() => deleteItem(index)} className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition" title="Hapus"><Icon path={paths.trash} size={14} /></button>
-                                                    </div>
-                                                </div>
-                                                <div className="p-4">
-                                                    <textarea 
-                                                        className={`w-full font-mono text-xs whitespace-pre-wrap leading-relaxed outline-none resize-none bg-transparent ${isUsed ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}
-                                                        rows={Math.max(3, item.text.split('\n').length + 2)}
-                                                        value={item.text}
-                                                        onChange={(e) => updateItemText(index, e.target.value)}
-                                                    />
-                                                    <div className="text-[10px] text-right text-gray-300 dark:text-gray-600 mt-1 border-t border-dashed dark:border-gray-700 pt-1">{fullText.length} chars</div>
-                                                </div>
-                                                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl border-t border-gray-100 dark:border-gray-700 flex gap-2">
-                                                    <button onClick={() => copyText(fullText, index)} className={`flex-1 py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition ${isCopied ? 'bg-green-500 text-white' : 'bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600'}`}>
-                                                        {isCopied ? <><Icon path={paths.check} /> Tersalin</> : <><Icon path={paths.copy} /> Copy</>}
-                                                    </button>
-                                                    <button onClick={() => openWA(fullText)} className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition" title="Kirim ke WhatsApp"><Icon path={paths.wa} /></button>
-                                                </div>
-                                            </div>
-                                        )
-                                    })
+                                        {/* Editable Text Area */}
+                                        <div className="p-5 flex-grow">
+                                            <textarea 
+                                                className="w-full font-mono text-sm md:text-base whitespace-pre-wrap leading-relaxed outline-none resize-none bg-transparent text-gray-800 dark:text-gray-200 min-h-[300px]"
+                                                value={`${currentItem.text}\n_ID: ${currentItem.id}_`}
+                                                onChange={(e) => {
+                                                    // Allow editing the text directly
+                                                    const newRaw = e.target.value.replace(`\n_ID: ${currentItem.id}_`, '');
+                                                    setCurrentItem({ ...currentItem, text: newRaw });
+                                                }}
+                                            />
+                                        </div>
+
+                                        {/* Big Action Buttons */}
+                                        <div className="p-5 pt-0 flex flex-col sm:flex-row gap-3">
+                                            <button 
+                                                onClick={handleCopy}
+                                                className={`flex-1 py-4 rounded-xl text-sm md:text-base font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98] ${
+                                                    isCopied 
+                                                    ? 'bg-green-500 text-white border-transparent' 
+                                                    : 'bg-blue-600 hover:bg-blue-700 text-white border-transparent'
+                                                }`}
+                                            >
+                                                {isCopied ? (
+                                                    <><Icon path={paths.check} size={20} /> Tersalin! Menyiapkan caption baru...</>
+                                                ) : (
+                                                    <><Icon path={paths.copy} size={20} /> Salin & Ganti Baru (Copy & Next)</>
+                                                )}
+                                            </button>
+                                            
+                                            <button 
+                                                onClick={openWA}
+                                                className="sm:w-auto w-full py-4 px-6 bg-green-500 hover:bg-green-600 text-white rounded-xl transition shadow-md flex items-center justify-center gap-2 font-bold"
+                                            >
+                                                <Icon path={paths.wa} size={20} /> <span className="sm:hidden inline">Kirim ke WA</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 )}
-                                {items.length > 0 && (<div className="text-center py-6 pb-20 md:pb-6"><span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></span><p className="text-[10px] text-gray-400 mt-1">Memuat lebih banyak...</p></div>)}
                             </div>
                         </div>
                     </div>
