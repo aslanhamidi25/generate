@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Generator Caption Ultimate</title>
+    <title>Generator Caption Ultimate Pro</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,6 +20,9 @@
                             text: '#c0caf5',
                             muted: '#565f89'
                         }
+                    },
+                    animation: {
+                        'pulse-short': 'pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) 2',
                     }
                 }
             }
@@ -54,8 +57,8 @@
         const { useState, useEffect, useRef } = React;
 
         // --- ICONS ---
-        const Icon = ({ path, size = 16 }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
+        const Icon = ({ path, size = 16, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`inline-block ${className}`}>
                 {path}
             </svg>
         );
@@ -75,10 +78,19 @@
             list: <><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></>,
             moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,
             sun: <><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,
-            arrowRight: <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>
+            arrowRight: <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>,
+            trash: <><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></>,
+            copyAll: <><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></>,
+            x: <><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>,
+            plus: <><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></>,
+            save: <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>,
+            bold: <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>,
+            italic: <line x1="19" y1="4" x2="10" y2="4"></line>,
+            strike: <line x1="5" y1="12" x2="19" y2="12"></line>,
+            mono: <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
         };
 
-        const CATEGORY_TEMPLATES = {
+        const INITIAL_TEMPLATES = {
             gadget: { label: "Gadget & Elektronik", opening: "{izin posting min|izin share min|izin lapak min|permisi posting min|numpang posting min|ijin posting admin}", conditions: "{baru|new|kondisi baru|fresh unit|belum pernah dipakai} {fullset|lengkap|kelengkapan lengkap|set lengkap}, {segel|masih segel|segel pabrik}, {garansi|bergaransi|jaminan} {resmi|official}", priceLabel: "{harga murah|harga terjangkau|best price|harga promo|harga spesial}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Sony A6000 Kit" },
             fashion: { label: "Fashion & Baju", opening: "{Ready Stock|Hadir Lagi|New Arrival|Restock Sist|Koleksi Baru}", conditions: "{Bahan adem|Kualitas premium|Jahitan rapi|Nyaman dipakai} {All Size|Ukuran Lengkap|Tersedia M/L/XL}, {Warna cantik|Pilihan warna banyak}, {Real pict|Foto asli|Sesuai gambar}", priceLabel: "{Harga promo|Diskon khusus|Harga cantik|Murah meriah}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Gamis Rayon Premium" },
             food: { label: "Makanan & Kuliner", opening: "{Open PO|Ready Hari Ini|Siap Antar|Fresh from Oven|Menu Baru}", conditions: "{Enak|Lezat|Gurih|Nikmat|Bikin nagih} {Tanpa pengawet|Bahan alami|100% Halal|Higienis}, {Made by order|Freshly made|Masih hangat}, {Bisa COD|Siap delivery}", priceLabel: "{Harga hemat|Paket hemat|Murah banget|Cuma}", linkLabel: "{link pembelian|link beli|link checkout|link order|link pemesanan|link transaksi} COD di sini:", placeholder: "Contoh: Sambal Cumi Pete" },
@@ -97,6 +109,54 @@
             return result;
         };
 
+        // --- AI LOGIC (Simulated) ---
+        const TONE_MODIFIERS = {
+            hype: {
+                label: "Hype / Semangat",
+                emojis: ["🔥", "⚡", "😱", "‼️", "🚀", "💯"],
+                keywords: {"murah": "HARGA HANCUR", "bagus": "KEREN PARAH", "diskon": "DISKON GILA", "promo": "PROMO BOMBASTIS", "ready": "READY GAN"}
+            },
+            soft: {
+                label: "Kalem / Soft",
+                emojis: ["✨", "🌸", "🤍", "🍃", "🧸", "🫶"],
+                keywords: {"murah": "harga bersahabat", "bagus": "cantik banget", "diskon": "potongan harga", "promo": "special offer", "ready": "tersedia ya kak"}
+            },
+            urgent: {
+                label: "Mendesak / Flash Sale",
+                emojis: ["⏳", "⚠️", "🚨", "🏃‍♂️", "💨"],
+                keywords: {"murah": "CUMA HARI INI", "bagus": "BEST SELLER", "diskon": "LAST CALL", "promo": "FLASH SALE", "ready": "STOK TERBATAS"}
+            },
+            formal: {
+                label: "Profesional",
+                emojis: ["✅", "☑️", "▪️", "🔹"],
+                keywords: {"murah": "harga kompetitif", "bagus": "kualitas terjamin", "diskon": "penawaran khusus", "promo": "promo terbatas", "ready": "ready stock"}
+            }
+        };
+
+        const applyAiTone = (text, toneKey) => {
+            if (!toneKey) return text;
+            const config = TONE_MODIFIERS[toneKey];
+            let modified = text;
+
+            // 1. Replace Keywords
+            Object.keys(config.keywords).forEach(key => {
+                const regex = new RegExp(`\\b${key}\\b`, 'gi');
+                modified = modified.replace(regex, config.keywords[key]);
+            });
+
+            // 2. Add Emojis to lines randomly
+            const lines = modified.split('\n');
+            const resultLines = lines.map(line => {
+                if (line.trim().length > 10 && Math.random() > 0.6) {
+                    const emoji = config.emojis[Math.floor(Math.random() * config.emojis.length)];
+                    return `${emoji} ${line}`;
+                }
+                return line;
+            });
+
+            return resultLines.join('\n');
+        };
+
         const generateHashtags = (keywords) => {
             if (!keywords.trim()) return "";
             const words = keywords.split(',').map(w => w.trim()).filter(w => w);
@@ -106,25 +166,41 @@
         };
 
         function CaptionGenerator() {
-            // -- STATE --
             const [darkMode, setDarkMode] = useState(false);
             const [activeTab, setActiveTab] = useState('manual');
             const [mobileView, setMobileView] = useState('input'); 
-            const [selectedCategory, setSelectedCategory] = useState('gadget');
-            const [captionInput, setCaptionInput] = useState('');
             
+            // Category & Presets
+            const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+            const [selectedCategory, setSelectedCategory] = useState('gadget');
+            const [showSavePreset, setShowSavePreset] = useState(false);
+            const [newPresetName, setNewPresetName] = useState("");
+
+            const [captionInput, setCaptionInput] = useState('');
             const [autoForm, setAutoForm] = useState({ productName: '', price: '', link: '', description: '' });
             const [hashtags, setHashtags] = useState('');
             const [idSettings, setIdSettings] = useState({ prefix: '', mode: 'random', startSeq: 1 });
 
-            // UBAHAN UTAMA: State untuk satu hasil saja
+            // AI Tone State
+            const [selectedTone, setSelectedTone] = useState('');
+
+            const [templateConfig, setTemplateConfig] = useState({
+                opening: { enabled: true, text: INITIAL_TEMPLATES['gadget'].opening },
+                conditions: { enabled: true, text: INITIAL_TEMPLATES['gadget'].conditions },
+                priceLabel: { enabled: true, text: INITIAL_TEMPLATES['gadget'].priceLabel },
+                linkLabel: { enabled: true, text: INITIAL_TEMPLATES['gadget'].linkLabel }
+            });
+            const [editingSection, setEditingSection] = useState(null);
+
             const [currentItem, setCurrentItem] = useState(null);
             const [isCopied, setIsCopied] = useState(false);
+            const [copiedIndex, setCopiedIndex] = useState(null);
+            const [usedIndices, setUsedIndices] = useState([]);
+            const resultTextAreaRef = useRef(null);
 
-            // -- EFFECTS --
-
+            // Load Data
             useEffect(() => {
-                const savedData = localStorage.getItem('captionGenData_v4');
+                const savedData = localStorage.getItem('captionGenData_v6_pro');
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
                     setAutoForm(parsed.autoForm || { productName: '', price: '', link: '', description: '' });
@@ -133,38 +209,79 @@
                     setSelectedCategory(parsed.selectedCategory || 'gadget');
                     setDarkMode(parsed.darkMode || false);
                     if(parsed.currentItem) setCurrentItem(parsed.currentItem);
+                    if(parsed.templates) setTemplates(parsed.templates); // Load custom templates
+                    if(parsed.templateConfig) setTemplateConfig(parsed.templateConfig);
                 }
             }, []);
 
+            // Save Data
             useEffect(() => {
                 const dataToSave = {
-                    autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem
+                    autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates
                 };
-                localStorage.setItem('captionGenData_v4', JSON.stringify(dataToSave));
+                localStorage.setItem('captionGenData_v6_pro', JSON.stringify(dataToSave));
                 
                 if (darkMode) document.documentElement.classList.add('dark');
                 else document.documentElement.classList.remove('dark');
-                
-            }, [autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem]);
+            }, [autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates]);
 
+            // Change Template Config when Category Changes
+            useEffect(() => {
+                const currentTemplate = templates[selectedCategory];
+                if (currentTemplate) {
+                    setTemplateConfig(prev => ({
+                        opening: { ...prev.opening, text: currentTemplate.opening },
+                        conditions: { ...prev.conditions, text: currentTemplate.conditions },
+                        priceLabel: { ...prev.priceLabel, text: currentTemplate.priceLabel },
+                        linkLabel: { ...prev.linkLabel, text: currentTemplate.linkLabel }
+                    }));
+                }
+            }, [selectedCategory, templates]);
+
+            // Construct Caption Live
             useEffect(() => {
                 if (activeTab === 'auto') {
-                    const template = CATEGORY_TEMPLATES[selectedCategory];
                     const tagString = generateHashtags(hashtags);
-                    
                     let caption = "";
-                    caption += template.opening + "\n";
+
+                    if (templateConfig.opening.enabled) caption += templateConfig.opening.text + "\n";
                     caption += (autoForm.productName || "[Nama Produk]") + "\n";
                     if (autoForm.description) caption += autoForm.description + "\n";
-                    caption += template.conditions + "\n\n";
-                    caption += `${template.priceLabel} : Rp.${autoForm.price || "..."}\n`;
-                    caption += `${template.linkLabel || "Link/Kontak :"} ${autoForm.link || "..."}${tagString}`;
+                    
+                    if (templateConfig.conditions.enabled) caption += templateConfig.conditions.text + "\n\n";
+                    else caption += "\n"; 
+
+                    if (templateConfig.priceLabel.enabled) caption += `${templateConfig.priceLabel.text} : Rp.${autoForm.price || "..."}\n`;
+                    else caption += `Rp.${autoForm.price || "..."}\n`;
+
+                    if (templateConfig.linkLabel.enabled) caption += `${templateConfig.linkLabel.text} ${autoForm.link || "..."}${tagString}`;
+                    else caption += `${autoForm.link || "..."}${tagString}`;
 
                     setCaptionInput(caption);
                 }
-            }, [activeTab, autoForm, hashtags, selectedCategory]);
+            }, [activeTab, autoForm, hashtags, templateConfig]);
 
-            // -- FUNCTIONS --
+            // --- FUNCTIONS ---
+
+            const saveNewPreset = () => {
+                if (!newPresetName.trim()) return alert("Nama preset tidak boleh kosong!");
+                const id = newPresetName.toLowerCase().replace(/\s+/g, '_');
+                
+                const newTemplate = {
+                    label: newPresetName,
+                    opening: templateConfig.opening.text,
+                    conditions: templateConfig.conditions.text,
+                    priceLabel: templateConfig.priceLabel.text,
+                    linkLabel: templateConfig.linkLabel.text,
+                    placeholder: "Contoh Produk..."
+                };
+
+                setTemplates(prev => ({ ...prev, [id]: newTemplate }));
+                setSelectedCategory(id);
+                setNewPresetName("");
+                setShowSavePreset(false);
+                alert(`Preset "${newPresetName}" berhasil disimpan!`);
+            };
 
             const generateID = () => {
                 const { prefix, mode, startSeq } = idSettings;
@@ -186,11 +303,15 @@
                 }
                 
                 const newId = generateID();
-                const processedText = processSpintax(captionInput);
+                let processedText = processSpintax(captionInput);
+                
+                // APPLY AI TONE
+                if (selectedTone) {
+                    processedText = applyAiTone(processedText, selectedTone);
+                }
                 
                 setCurrentItem({ id: newId, text: processedText });
                 
-                // Update counter if sequential
                 if (idSettings.mode === 'sequential') {
                     setIdSettings(prev => ({ ...prev, startSeq: parseInt(prev.startSeq) + 1 }));
                 }
@@ -200,9 +321,7 @@
 
             const handleCopy = () => {
                 if (!currentItem) return;
-                
                 const fullText = `${currentItem.text}\n_ID: ${currentItem.id}_`;
-                
                 try {
                     const textArea = document.createElement("textarea");
                     textArea.value = fullText;
@@ -215,13 +334,43 @@
                     
                     if (successful) {
                         setIsCopied(true);
-                        // Delay 1 detik untuk tunjukkan label "Tersalin", lalu otomatis ganti baru
                         setTimeout(() => {
                             setIsCopied(false);
                             generateNewResult();
                         }, 1000);
                     }
                 } catch (err) { console.error(err); }
+            };
+
+            // Formatting Function
+            const applyFormatting = (format) => {
+                const textarea = resultTextAreaRef.current;
+                if (!textarea) return;
+
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const sel = textarea.value.substring(start, end);
+                if (!sel) return;
+
+                let wrapper = "";
+                if (format === 'bold') wrapper = "*";
+                if (format === 'italic') wrapper = "_";
+                if (format === 'strike') wrapper = "~";
+                if (format === 'mono') wrapper = "```";
+
+                const newText = textarea.value.substring(0, start) + wrapper + sel + wrapper + textarea.value.substring(end);
+                
+                // Update state but keep ID separate
+                // Actually currentItem.text is the main content
+                // We need to be careful not to double append ID. 
+                // The textarea displays `text + ID`. We need to strip ID before saving back to state.
+                const idSuffix = `\n_ID: ${currentItem.id}_`;
+                const textOnly = newText.replace(idSuffix, "");
+                
+                setCurrentItem({ ...currentItem, text: textOnly });
+                
+                // Restore selection/cursor is tricky in React state update, simple focus for now
+                textarea.focus();
             };
 
             const openWA = () => {
@@ -232,18 +381,15 @@
 
             const exportCSV = () => {
                 if (!captionInput.trim()) return alert("Isi caption terlebih dahulu!");
-                
-                // Walaupun UI 1 per 1, fitur export tetap generate 50 sekaligus agar mudah
                 const exportBatch = [];
                 let currentSeq = parseInt(idSettings.startSeq);
-                
                 for(let i=0; i<50; i++) {
                     let idBody = idSettings.mode === 'sequential' ? (currentSeq + i).toString().padStart(4, '0') : Math.floor(10000 + Math.random() * 89999).toString();
                     let finalId = idSettings.prefix ? `${idSettings.prefix}-${idBody}` : idBody;
                     let processedText = processSpintax(captionInput);
+                    if(selectedTone) processedText = applyAiTone(processedText, selectedTone);
                     exportBatch.push({ id: finalId, text: processedText });
                 }
-
                 let csvContent = "data:text/csv;charset=utf-8,ID,Caption\n";
                 exportBatch.forEach(row => {
                     const safeText = row.text.replace(/"/g, '""'); 
@@ -256,6 +402,45 @@
                 link.click();
             };
 
+            // Helper to update template config
+            const toggleSection = (key) => {
+                setTemplateConfig(prev => ({ ...prev, [key]: { ...prev[key], enabled: !prev[key].enabled } }));
+            };
+            
+            const updateSectionText = (key, text) => {
+                setTemplateConfig(prev => ({ ...prev, [key]: { ...prev[key], text } }));
+            };
+
+            const renderTemplateSection = (key, label, placeholder) => {
+                const config = templateConfig[key];
+                const isEditing = editingSection === key;
+
+                return (
+                    <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm transition-all hover:border-blue-300 dark:hover:border-blue-700">
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" checked={config.enabled} onChange={() => toggleSection(key)} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
+                                <span className={`text-xs font-bold uppercase tracking-wider ${config.enabled ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 line-through'}`}>{label}</span>
+                            </label>
+                            <button onClick={() => setEditingSection(isEditing ? null : key)} className={`p-1.5 rounded transition ${isEditing ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Edit Template Spintax">
+                                {isEditing ? <Icon path={paths.check} size={14}/> : <Icon path={paths.edit} size={14}/>}
+                            </button>
+                        </div>
+                        {config.enabled && (
+                            <div className="animate-fade-in">
+                                {isEditing ? (
+                                    <textarea className="w-full p-2 border border-blue-200 dark:border-blue-800 rounded bg-blue-50/50 dark:bg-blue-900/10 text-[11px] font-mono text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400" rows="3" value={config.text} onChange={(e) => updateSectionText(key, e.target.value)} placeholder={placeholder} />
+                                ) : (
+                                    <div className="text-[10px] text-gray-500 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-800/50 p-2 rounded border border-gray-100 dark:border-gray-700 truncate cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" onClick={() => setEditingSection(key)} title="Klik untuk edit">
+                                        {config.text}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
             return (
                 <div className="h-dvh flex flex-col overflow-hidden">
                     {/* Header */}
@@ -263,9 +448,9 @@
                         <div className="max-w-7xl mx-auto flex flex-row justify-between items-center gap-2">
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-xl font-bold flex items-center gap-2">
-                                    <Icon path={paths.bag} /> <span className="hidden md:inline">Generator Caption Ultimate</span><span className="md:hidden">Caption Generator</span>
+                                    <Icon path={paths.bag} /> <span className="hidden md:inline">Generator Caption Ultimate Pro</span><span className="md:hidden">Caption Gen Pro</span>
                                 </h1>
-                                <p className="text-blue-100 dark:text-gray-400 text-[10px] hidden md:block">Mode Satu-per-Satu | Copy langsung berganti otomatis</p>
+                                <p className="text-blue-100 dark:text-gray-400 text-[10px] hidden md:block">Tool jualan lengkap dengan AI Tone, Presets, WhatsApp, & Export Excel</p>
                             </div>
                             <div className="flex gap-2 items-center">
                                 <button onClick={() => setDarkMode(!darkMode)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition" title={darkMode ? "Mode Terang" : "Mode Gelap"}>
@@ -299,49 +484,92 @@
                                     <button onClick={() => setActiveTab('auto')} className={`flex-1 py-2 text-sm font-bold rounded-md transition ${activeTab === 'auto' ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}>Otomatis</button>
                                 </div>
 
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Kategori Produk</label>
+                                {/* CATEGORY & PRESETS */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Kategori / Preset</label>
+                                        <button onClick={() => setShowSavePreset(!showSavePreset)} className="text-[10px] flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline">
+                                            <Icon path={paths.plus} size={10} /> Simpan Preset
+                                        </button>
+                                    </div>
+                                    
+                                    {showSavePreset && (
+                                        <div className="flex gap-2 mb-2 animate-fade-in">
+                                            <input type="text" placeholder="Nama Preset (Misal: Skincare)" className="flex-grow p-2 text-xs border rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white" value={newPresetName} onChange={e => setNewPresetName(e.target.value)} />
+                                            <button onClick={saveNewPreset} className="bg-blue-600 text-white px-3 rounded text-xs"><Icon path={paths.save} size={12} /></button>
+                                        </div>
+                                    )}
+
                                     <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
-                                        {Object.keys(CATEGORY_TEMPLATES).map(key => (<option key={key} value={key}>{CATEGORY_TEMPLATES[key].label}</option>))}
+                                        {Object.keys(templates).map(key => (<option key={key} value={key}>{templates[key].label}</option>))}
                                     </select>
                                 </div>
 
-                                <div className="bg-white dark:bg-dark-card rounded-lg">
-                                    {activeTab === 'manual' ? (
-                                        <textarea className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none h-64 bg-transparent dark:text-gray-200" placeholder={`Paste caption Spintax disini...\nContoh: {Jual|Ready} Barang {Bagus|Murah}`} value={captionInput} onChange={(e) => setCaptionInput(e.target.value)} />
-                                    ) : (
-                                        <div className="space-y-3">
+                                {activeTab === 'manual' ? (
+                                    <div className="bg-white dark:bg-dark-card rounded-lg">
+                                        <textarea className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none h-96 bg-transparent dark:text-gray-200" placeholder={`Paste caption Spintax disini...\nContoh: {Jual|Ready} Barang {Bagus|Murah}`} value={captionInput} onChange={(e) => setCaptionInput(e.target.value)} />
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        
+                                        {renderTemplateSection('opening', 'Template Opening', '{Halo|Hai}')}
+
+                                        <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                                             <div>
-                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400">Nama Produk</label>
-                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 bg-transparent dark:text-gray-200" placeholder={CATEGORY_TEMPLATES[selectedCategory].placeholder} value={autoForm.productName} onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})} />
+                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1 block">Nama Produk</label>
+                                                <input type="text" className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-200" placeholder="Contoh: Sony A6000" value={autoForm.productName} onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})} />
                                             </div>
                                             <div>
-                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400">Deskripsi Tambahan (Opsional)</label>
-                                                <textarea rows="2" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 text-sm bg-transparent dark:text-gray-200" placeholder="Warna merah, size L..." value={autoForm.description} onChange={(e) => setAutoForm({...autoForm, description: e.target.value})} />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <div><label className="text-xs font-bold text-gray-600 dark:text-gray-400">Harga</label><input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="150.000" value={autoForm.price} onChange={(e) => setAutoForm({...autoForm, price: e.target.value})} /></div>
-                                                <div><label className="text-xs font-bold text-gray-600 dark:text-gray-400">Link / Kontak</label><input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="shopee.co.id/..." value={autoForm.link} onChange={(e) => setAutoForm({...autoForm, link: e.target.value})} /></div>
-                                            </div>
-                                            <div className="pt-2 border-t border-dashed dark:border-gray-700">
-                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1"><Icon path={paths.hash} /> Hashtag (Pisahkan dengan koma)</label>
-                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm dark:text-gray-200" placeholder="sepatu, murah, promo" value={hashtags} onChange={(e) => setHashtags(e.target.value)} />
-                                            </div>
-                                            <div className="p-3 bg-yellow-50 dark:bg-gray-800 border border-yellow-100 dark:border-gray-700 rounded-lg text-[10px] text-gray-600 dark:text-gray-400 font-mono h-24 overflow-y-auto">
-                                                <span className="font-bold text-yellow-700 dark:text-yellow-500 block mb-1">Preview Raw Spintax:</span>
-                                                {captionInput || "..."}
+                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1 block">Deskripsi Tambahan</label>
+                                                <textarea rows="2" className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-gray-200" placeholder="Warna merah, size L..." value={autoForm.description} onChange={(e) => setAutoForm({...autoForm, description: e.target.value})} />
                                             </div>
                                         </div>
-                                    )}
-                                </div>
+
+                                        {renderTemplateSection('conditions', 'Template Kondisi/Ket.', '{Baru|Bekas}')}
+
+                                        <div className="space-y-2">
+                                            {renderTemplateSection('priceLabel', 'Label Harga', '{Harga|Price}')}
+                                            <div className="pl-2">
+                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="Rp. 150.000" value={autoForm.price} onChange={(e) => setAutoForm({...autoForm, price: e.target.value})} />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            {renderTemplateSection('linkLabel', 'Label Link', '{Link|Order}')}
+                                            <div className="pl-2">
+                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="shopee.co.id/..." value={autoForm.link} onChange={(e) => setAutoForm({...autoForm, link: e.target.value})} />
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2 border-t border-dashed dark:border-gray-700">
+                                            <label className="text-xs font-bold text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1"><Icon path={paths.hash} /> Hashtag (Pisahkan dengan koma)</label>
+                                            <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm dark:text-gray-200" placeholder="sepatu, murah, promo" value={hashtags} onChange={(e) => setHashtags(e.target.value)} />
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                                     <div className="flex items-center gap-2 mb-3 text-gray-700 dark:text-gray-300 font-bold text-xs uppercase"><Icon path={paths.settings} /> Pengaturan ID Unik</div>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Prefix</label><input type="text" placeholder="Contoh: TOKO-" className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.prefix} onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})} /></div>
+                                        <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Prefix</label><input type="text" placeholder="TOKO-" className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.prefix} onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})} /></div>
                                         <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Mode ID</label><select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.mode} onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}><option value="random">Acak</option><option value="sequential">Urut</option></select></div>
                                     </div>
                                     {idSettings.mode === 'sequential' && (<div className="mt-2 flex items-center gap-2"><label className="text-xs text-gray-500 dark:text-gray-400">Mulai dari:</label><input type="number" className="p-1 border border-gray-300 dark:border-gray-600 rounded w-20 text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.startSeq} onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})} /></div>)}
+                                </div>
+
+                                <div className="mb-8">
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 block">AI Magic Tone (Opsional)</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {Object.keys(TONE_MODIFIERS).map(key => (
+                                            <button 
+                                                key={key}
+                                                onClick={() => setSelectedTone(selectedTone === key ? '' : key)}
+                                                className={`text-xs p-2 rounded border transition text-left ${selectedTone === key ? 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900 dark:text-blue-200' : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300'}`}
+                                            >
+                                                <span className="block font-bold">{TONE_MODIFIERS[key].emojis[0]} {TONE_MODIFIERS[key].label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <button onClick={generateNewResult} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition mb-8"><Icon path={paths.wand} /> MULAILAH (GENERATE)</button>
@@ -356,7 +584,7 @@
                                     <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 p-1.5 rounded-md"><Icon path={paths.edit} /></span>
                                     <div>
                                         <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">Hasil Caption Anda</h3>
-                                        <p className="text-[10px] text-gray-400">Copy untuk mengganti otomatis</p>
+                                        <p className="text-[10px] text-gray-400">Blok teks untuk format bold/italic</p>
                                     </div>
                                 </div>
                                 <button onClick={generateNewResult} className="text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded border border-blue-200 dark:border-blue-900 transition flex items-center gap-1">
@@ -384,13 +612,21 @@
                                             </span>
                                         </div>
 
+                                        {/* Formatting Toolbar (Nomor 3) */}
+                                        <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 flex gap-2 overflow-x-auto bg-white dark:bg-dark-card">
+                                            <button onClick={() => applyFormatting('bold')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-600 dark:text-gray-300" title="Bold"><Icon path={paths.bold} size={14}/></button>
+                                            <button onClick={() => applyFormatting('italic')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-600 dark:text-gray-300" title="Italic"><Icon path={paths.italic} size={14}/></button>
+                                            <button onClick={() => applyFormatting('strike')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-600 dark:text-gray-300" title="Strikethrough"><Icon path={paths.strike} size={14}/></button>
+                                            <button onClick={() => applyFormatting('mono')} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-600 dark:text-gray-300" title="Monospace"><Icon path={paths.mono} size={14}/></button>
+                                        </div>
+
                                         {/* Editable Text Area */}
                                         <div className="p-5 flex-grow">
                                             <textarea 
+                                                ref={resultTextAreaRef}
                                                 className="w-full font-mono text-sm md:text-base whitespace-pre-wrap leading-relaxed outline-none resize-none bg-transparent text-gray-800 dark:text-gray-200 min-h-[300px]"
                                                 value={`${currentItem.text}\n_ID: ${currentItem.id}_`}
                                                 onChange={(e) => {
-                                                    // Allow editing the text directly
                                                     const newRaw = e.target.value.replace(`\n_ID: ${currentItem.id}_`, '');
                                                     setCurrentItem({ ...currentItem, text: newRaw });
                                                 }}
