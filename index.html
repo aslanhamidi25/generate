@@ -140,13 +140,11 @@
             const config = TONE_MODIFIERS[toneKey];
             let modified = text;
 
-            // 1. Replace Keywords
             Object.keys(config.keywords).forEach(key => {
                 const regex = new RegExp(`\\b${key}\\b`, 'gi');
                 modified = modified.replace(regex, config.keywords[key]);
             });
 
-            // 2. Add Emojis to lines randomly
             const lines = modified.split('\n');
             const resultLines = lines.map(line => {
                 if (line.trim().length > 10 && Math.random() > 0.6) {
@@ -181,17 +179,24 @@
             const [captionInput, setCaptionInput] = useState('');
             const [autoForm, setAutoForm] = useState({ productName: '', price: '', link: '', description: '' });
             const [hashtags, setHashtags] = useState('');
-            const [idSettings, setIdSettings] = useState({ prefix: '', mode: 'random', startSeq: 1 });
+            // UBAHAN: Menambahkan property enabled: true pada state awal
+            const [idSettings, setIdSettings] = useState({ enabled: true, prefix: '', mode: 'random', startSeq: 1 });
 
             // AI Tone State
             const [selectedTone, setSelectedTone] = useState('');
 
-            const [templateConfig, setTemplateConfig] = useState({
+            // DEFAULT CONFIG including product name & description
+            const defaultTemplateConfig = {
                 opening: { enabled: true, text: INITIAL_TEMPLATES['gadget'].opening },
                 conditions: { enabled: true, text: INITIAL_TEMPLATES['gadget'].conditions },
                 priceLabel: { enabled: true, text: INITIAL_TEMPLATES['gadget'].priceLabel },
-                linkLabel: { enabled: true, text: INITIAL_TEMPLATES['gadget'].linkLabel }
-            });
+                linkLabel: { enabled: true, text: INITIAL_TEMPLATES['gadget'].linkLabel },
+                productName: { enabled: true, text: '' },
+                description: { enabled: true, text: '' },
+                hashtags: { enabled: true, text: '' }
+            };
+
+            const [templateConfig, setTemplateConfig] = useState(defaultTemplateConfig);
             const [editingSection, setEditingSection] = useState(null);
 
             // Reorder State
@@ -205,17 +210,24 @@
 
             // Load Data
             useEffect(() => {
-                const savedData = localStorage.getItem('captionGenData_v7_pro');
+                const savedData = localStorage.getItem('captionGenData_v8_pro');
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
                     setAutoForm(parsed.autoForm || { productName: '', price: '', link: '', description: '' });
                     setHashtags(parsed.hashtags || '');
-                    setIdSettings(parsed.idSettings || { prefix: '', mode: 'random', startSeq: 1 });
+                    // UBAHAN: Memastikan state enabled dimuat atau default ke true jika data lama
+                    const loadedIdSettings = parsed.idSettings || { prefix: '', mode: 'random', startSeq: 1 };
+                    if (loadedIdSettings.enabled === undefined) loadedIdSettings.enabled = true;
+                    setIdSettings(loadedIdSettings);
+                    
                     setSelectedCategory(parsed.selectedCategory || 'gadget');
                     setDarkMode(parsed.darkMode || false);
                     if(parsed.currentItem) setCurrentItem(parsed.currentItem);
                     if(parsed.templates) setTemplates(parsed.templates); 
-                    if(parsed.templateConfig) setTemplateConfig(parsed.templateConfig);
+                    
+                    if(parsed.templateConfig) {
+                        setTemplateConfig(prev => ({...defaultTemplateConfig, ...parsed.templateConfig}));
+                    }
                     if(parsed.sectionOrder) setSectionOrder(parsed.sectionOrder);
                 }
             }, []);
@@ -225,7 +237,7 @@
                 const dataToSave = {
                     autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates, sectionOrder
                 };
-                localStorage.setItem('captionGenData_v7_pro', JSON.stringify(dataToSave));
+                localStorage.setItem('captionGenData_v8_pro', JSON.stringify(dataToSave));
                 
                 if (darkMode) document.documentElement.classList.add('dark');
                 else document.documentElement.classList.remove('dark');
@@ -236,6 +248,7 @@
                 const currentTemplate = templates[selectedCategory];
                 if (currentTemplate) {
                     setTemplateConfig(prev => ({
+                        ...prev,
                         opening: { ...prev.opening, text: currentTemplate.opening },
                         conditions: { ...prev.conditions, text: currentTemplate.conditions },
                         priceLabel: { ...prev.priceLabel, text: currentTemplate.priceLabel },
@@ -256,10 +269,10 @@
                                 if (templateConfig.opening.enabled) caption += templateConfig.opening.text + "\n";
                                 break;
                             case 'productName':
-                                caption += (autoForm.productName || "[Nama Produk]") + "\n";
+                                if (templateConfig.productName.enabled) caption += (autoForm.productName || "[Nama Produk]") + "\n";
                                 break;
                             case 'description':
-                                if (autoForm.description) caption += autoForm.description + "\n";
+                                if (templateConfig.description.enabled && autoForm.description) caption += autoForm.description + "\n";
                                 break;
                             case 'conditions':
                                 if (templateConfig.conditions.enabled) caption += templateConfig.conditions.text + "\n\n";
@@ -274,7 +287,7 @@
                                 else caption += `${autoForm.link || "..."}`;
                                 break;
                             case 'hashtags':
-                                caption += tagString;
+                                if (templateConfig.hashtags.enabled) caption += tagString;
                                 break;
                         }
                     });
@@ -334,7 +347,16 @@
                     return;
                 }
                 
-                const newId = generateID();
+                // UBAHAN: Cek idSettings.enabled sebelum generate ID
+                let newId = null;
+                if (idSettings.enabled) {
+                    newId = generateID();
+                    
+                    if (idSettings.mode === 'sequential') {
+                        setIdSettings(prev => ({ ...prev, startSeq: parseInt(prev.startSeq) + 1 }));
+                    }
+                }
+                
                 let processedText = processSpintax(captionInput);
                 
                 if (selectedTone) {
@@ -342,17 +364,13 @@
                 }
                 
                 setCurrentItem({ id: newId, text: processedText });
-                
-                if (idSettings.mode === 'sequential') {
-                    setIdSettings(prev => ({ ...prev, startSeq: parseInt(prev.startSeq) + 1 }));
-                }
-                
                 setMobileView('results');
             };
 
             const handleCopy = () => {
                 if (!currentItem) return;
-                const fullText = `${currentItem.text}\n_ID: ${currentItem.id}_`;
+                // UBAHAN: Hanya menyertakan ID jika ada (enabled)
+                const fullText = `${currentItem.text}${currentItem.id ? `\n_ID: ${currentItem.id}_` : ''}`;
                 try {
                     const textArea = document.createElement("textarea");
                     textArea.value = fullText;
@@ -390,7 +408,10 @@
 
                 const newText = textarea.value.substring(0, start) + wrapper + sel + wrapper + textarea.value.substring(end);
                 
-                const idSuffix = `\n_ID: ${currentItem.id}_`;
+                // UBAHAN: Menghapus ID dari teks sebelum update state (karena ID ditampilkan terpisah atau di-append saat render)
+                // Namun di sini kita mengedit langsung textarea yang berisi gabungan teks + ID
+                // Jadi kita perlu memisahkan kembali
+                const idSuffix = currentItem.id ? `\n_ID: ${currentItem.id}_` : '';
                 const textOnly = newText.replace(idSuffix, "");
                 
                 setCurrentItem({ ...currentItem, text: textOnly });
@@ -399,7 +420,7 @@
 
             const openWA = () => {
                 if (!currentItem) return;
-                const fullText = `${currentItem.text}\n_ID: ${currentItem.id}_`;
+                const fullText = `${currentItem.text}${currentItem.id ? `\n_ID: ${currentItem.id}_` : ''}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
             };
 
@@ -408,8 +429,13 @@
                 const exportBatch = [];
                 let currentSeq = parseInt(idSettings.startSeq);
                 for(let i=0; i<50; i++) {
-                    let idBody = idSettings.mode === 'sequential' ? (currentSeq + i).toString().padStart(4, '0') : Math.floor(10000 + Math.random() * 89999).toString();
-                    let finalId = idSettings.prefix ? `${idSettings.prefix}-${idBody}` : idBody;
+                    // UBAHAN: Logika export CSV juga menghormati setting ID
+                    let finalId = '';
+                    if (idSettings.enabled) {
+                        let idBody = idSettings.mode === 'sequential' ? (currentSeq + i).toString().padStart(4, '0') : Math.floor(10000 + Math.random() * 89999).toString();
+                        finalId = idSettings.prefix ? `${idSettings.prefix}-${idBody}` : idBody;
+                    }
+                    
                     let processedText = processSpintax(captionInput);
                     if(selectedTone) processedText = applyAiTone(processedText, selectedTone);
                     exportBatch.push({ id: finalId, text: processedText });
@@ -454,7 +480,7 @@
             );
 
             const renderTemplateSection = (key, label, placeholder, index) => {
-                const config = templateConfig[key];
+                const config = templateConfig[key] || { enabled: true, text: "" };
                 const isEditing = editingSection === key;
 
                 return (
@@ -486,15 +512,28 @@
                 );
             };
 
-            const renderInputSection = (id, label, content, index) => (
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all">
-                    <div className="flex justify-between items-center mb-2">
-                        <label className="text-xs font-bold text-gray-600 dark:text-gray-400">{label}</label>
-                        {renderSectionHeaderButtons(id, index)}
+            const renderInputSection = (id, label, content, index) => {
+                const config = templateConfig[id] || { enabled: true };
+                const isEnabled = config.enabled;
+
+                return (
+                    <div className={`bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 shadow-sm transition-all ${isEnabled ? 'hover:border-blue-300 dark:hover:border-blue-700' : 'opacity-70'}`}>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input 
+                                    type="checkbox" 
+                                    checked={isEnabled} 
+                                    onChange={() => toggleSection(id)}
+                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                />
+                                <span className={`text-xs font-bold text-gray-600 dark:text-gray-400 ${!isEnabled ? 'line-through opacity-50' : ''}`}>{label}</span>
+                            </label>
+                            {renderSectionHeaderButtons(id, index)}
+                        </div>
+                        {isEnabled && content}
                     </div>
-                    {content}
-                </div>
-            );
+                );
+            };
 
             return (
                 <div className="h-dvh flex flex-col overflow-hidden">
@@ -588,32 +627,75 @@
                                                 
                                                 case 'price':
                                                     return <React.Fragment key={sectionId}>
-                                                        <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all">
+                                                        <div className={`bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm transition-all ${templateConfig.priceLabel.enabled ? 'hover:border-blue-300 dark:hover:border-blue-700' : 'opacity-70'}`}>
                                                             <div className="flex justify-between items-center mb-2">
                                                                 <div className="flex-1">
-                                                                    {renderTemplateSection('priceLabel', 'Label Harga', '{Harga|Price}', -1)} 
-                                                                    {/* Note: Nested template section inside price block, reusing component but without move buttons on inner part */}
+                                                                    <div className="flex items-center mb-1">
+                                                                        <label className="flex items-center gap-2 cursor-pointer select-none mr-2">
+                                                                            <input type="checkbox" checked={templateConfig.priceLabel.enabled} onChange={() => toggleSection('priceLabel')} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
+                                                                            <span className={`text-xs font-bold uppercase tracking-wider ${templateConfig.priceLabel.enabled ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 line-through'}`}>Label Harga</span>
+                                                                        </label>
+                                                                        <button onClick={() => setEditingSection(editingSection === 'priceLabel' ? null : 'priceLabel')} className={`p-1.5 rounded transition mr-2 ${editingSection === 'priceLabel' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Edit Template Spintax">
+                                                                            {editingSection === 'priceLabel' ? <Icon path={paths.check} size={14}/> : <Icon path={paths.edit} size={14}/>}
+                                                                        </button>
+                                                                    </div>
+                                                                    
+                                                                    {templateConfig.priceLabel.enabled && (
+                                                                        <div className="animate-fade-in">
+                                                                            {editingSection === 'priceLabel' ? (
+                                                                                <textarea className="w-full p-2 border border-blue-200 dark:border-blue-800 rounded bg-blue-50/50 dark:bg-blue-900/10 text-[11px] font-mono text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400" rows="3" value={templateConfig.priceLabel.text} onChange={(e) => updateSectionText('priceLabel', e.target.value)} placeholder="{Harga|Price}" />
+                                                                            ) : (
+                                                                                <div className="text-[10px] text-gray-500 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-800/50 p-2 rounded border border-gray-100 dark:border-gray-700 truncate cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" onClick={() => setEditingSection('priceLabel')} title="Klik untuk edit">
+                                                                                    {templateConfig.priceLabel.text}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                                 {renderSectionHeaderButtons('price', index)}
                                                             </div>
-                                                            <div className="mt-2">
-                                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="Rp. 150.000" value={autoForm.price} onChange={(e) => setAutoForm({...autoForm, price: e.target.value})} />
-                                                            </div>
+                                                            {templateConfig.priceLabel.enabled && (
+                                                                <div className="mt-2">
+                                                                    <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="Rp. 150.000" value={autoForm.price} onChange={(e) => setAutoForm({...autoForm, price: e.target.value})} />
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </React.Fragment>;
                                                 
                                                 case 'link':
                                                     return <React.Fragment key={sectionId}>
-                                                        <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all">
+                                                        <div className={`bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm transition-all ${templateConfig.linkLabel.enabled ? 'hover:border-blue-300 dark:hover:border-blue-700' : 'opacity-70'}`}>
                                                             <div className="flex justify-between items-center mb-2">
                                                                 <div className="flex-1">
-                                                                    {renderTemplateSection('linkLabel', 'Label Link', '{Link|Order}', -1)}
+                                                                    <div className="flex items-center mb-1">
+                                                                        <label className="flex items-center gap-2 cursor-pointer select-none mr-2">
+                                                                            <input type="checkbox" checked={templateConfig.linkLabel.enabled} onChange={() => toggleSection('linkLabel')} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
+                                                                            <span className={`text-xs font-bold uppercase tracking-wider ${templateConfig.linkLabel.enabled ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 line-through'}`}>Label Link</span>
+                                                                        </label>
+                                                                        <button onClick={() => setEditingSection(editingSection === 'linkLabel' ? null : 'linkLabel')} className={`p-1.5 rounded transition mr-2 ${editingSection === 'linkLabel' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Edit Template Spintax">
+                                                                            {editingSection === 'linkLabel' ? <Icon path={paths.check} size={14}/> : <Icon path={paths.edit} size={14}/>}
+                                                                        </button>
+                                                                    </div>
+                                                                    
+                                                                    {templateConfig.linkLabel.enabled && (
+                                                                        <div className="animate-fade-in">
+                                                                            {editingSection === 'linkLabel' ? (
+                                                                                <textarea className="w-full p-2 border border-blue-200 dark:border-blue-800 rounded bg-blue-50/50 dark:bg-blue-900/10 text-[11px] font-mono text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400" rows="3" value={templateConfig.linkLabel.text} onChange={(e) => updateSectionText('linkLabel', e.target.value)} placeholder="{Link|Order}" />
+                                                                            ) : (
+                                                                                <div className="text-[10px] text-gray-500 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-800/50 p-2 rounded border border-gray-100 dark:border-gray-700 truncate cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition" onClick={() => setEditingSection('linkLabel')} title="Klik untuk edit">
+                                                                                    {templateConfig.linkLabel.text}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                                 {renderSectionHeaderButtons('link', index)}
                                                             </div>
-                                                            <div className="mt-2">
-                                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="shopee.co.id/..." value={autoForm.link} onChange={(e) => setAutoForm({...autoForm, link: e.target.value})} />
-                                                            </div>
+                                                            {templateConfig.linkLabel.enabled && (
+                                                                <div className="mt-2">
+                                                                    <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="shopee.co.id/..." value={autoForm.link} onChange={(e) => setAutoForm({...autoForm, link: e.target.value})} />
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </React.Fragment>;
                                                 
@@ -628,18 +710,32 @@
                                                 default: return null;
                                             }
                                         })}
-
-                                        {/* Preview Box removed per request */}
                                     </div>
                                 )}
 
-                                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <div className="flex items-center gap-2 mb-3 text-gray-700 dark:text-gray-300 font-bold text-xs uppercase"><Icon path={paths.settings} /> Pengaturan ID Unik</div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Prefix</label><input type="text" placeholder="Contoh: TOKO-" className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.prefix} onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})} /></div>
-                                        <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Mode ID</label><select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.mode} onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}><option value="random">Acak</option><option value="sequential">Urut</option></select></div>
+                                {/* UBAHAN: Update tampilan ID Settings dengan Checkbox */}
+                                <div className={`p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-all ${idSettings.enabled ? '' : 'opacity-70'}`}>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={idSettings.enabled} 
+                                                onChange={(e) => setIdSettings({...idSettings, enabled: e.target.checked})}
+                                                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                                            />
+                                            <div className={`flex items-center gap-2 font-bold text-xs uppercase ${idSettings.enabled ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500 line-through'}`}>
+                                                <Icon path={paths.settings} /> Pengaturan ID Unik
+                                            </div>
+                                        </label>
                                     </div>
-                                    {idSettings.mode === 'sequential' && (<div className="mt-2 flex items-center gap-2"><label className="text-xs text-gray-500 dark:text-gray-400">Mulai dari:</label><input type="number" className="p-1 border border-gray-300 dark:border-gray-600 rounded w-20 text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.startSeq} onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})} /></div>)}
+                                    
+                                    {idSettings.enabled && (
+                                        <div className="grid grid-cols-2 gap-3 animate-fade-in">
+                                            <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Prefix</label><input type="text" placeholder="TOKO-" className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.prefix} onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})} /></div>
+                                            <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Mode ID</label><select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.mode} onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}><option value="random">Acak</option><option value="sequential">Urut</option></select></div>
+                                            {idSettings.mode === 'sequential' && (<div className="col-span-2 flex items-center gap-2"><label className="text-xs text-gray-500 dark:text-gray-400">Mulai dari:</label><input type="number" className="p-1 border border-gray-300 dark:border-gray-600 rounded w-20 text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.startSeq} onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})} /></div>)}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="mb-8">
@@ -692,8 +788,9 @@
                                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Siap Digunakan
                                             </span>
-                                            <span className="font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
-                                                ID: {currentItem.id}
+                                            {/* UBAHAN: Menampilkan ID atau "Tanpa ID" */}
+                                            <span className={`font-mono font-bold px-2 py-0.5 rounded border ${currentItem.id ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800' : 'text-gray-400 border-gray-200 dark:border-gray-700'}`}>
+                                                {currentItem.id ? `ID: ${currentItem.id}` : 'Tanpa ID'}
                                             </span>
                                         </div>
 
@@ -710,9 +807,12 @@
                                             <textarea 
                                                 ref={resultTextAreaRef}
                                                 className="w-full font-mono text-sm md:text-base whitespace-pre-wrap leading-relaxed outline-none resize-none bg-transparent text-gray-800 dark:text-gray-200 min-h-[300px]"
-                                                value={`${currentItem.text}\n_ID: ${currentItem.id}_`}
+                                                // UBAHAN: Teks yang ditampilkan disesuaikan jika ID ada atau tidak
+                                                value={`${currentItem.text}${currentItem.id ? `\n_ID: ${currentItem.id}_` : ''}`}
                                                 onChange={(e) => {
-                                                    const newRaw = e.target.value.replace(`\n_ID: ${currentItem.id}_`, '');
+                                                    // UBAHAN: Logic penggantian teks juga disesuaikan
+                                                    const idSuffix = currentItem.id ? `\n_ID: ${currentItem.id}_` : '';
+                                                    const newRaw = e.target.value.replace(idSuffix, '');
                                                     setCurrentItem({ ...currentItem, text: newRaw });
                                                 }}
                                             />
