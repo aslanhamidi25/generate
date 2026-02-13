@@ -87,7 +87,9 @@
             bold: <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>,
             italic: <line x1="19" y1="4" x2="10" y2="4"></line>,
             strike: <line x1="5" y1="12" x2="19" y2="12"></line>,
-            mono: <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+            mono: <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>,
+            arrowUp: <><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></>,
+            arrowDown: <><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></>
         };
 
         const INITIAL_TEMPLATES = {
@@ -192,6 +194,9 @@
             });
             const [editingSection, setEditingSection] = useState(null);
 
+            // Reorder State
+            const [sectionOrder, setSectionOrder] = useState(['opening', 'productName', 'description', 'conditions', 'price', 'link', 'hashtags']);
+
             const [currentItem, setCurrentItem] = useState(null);
             const [isCopied, setIsCopied] = useState(false);
             const [copiedIndex, setCopiedIndex] = useState(null);
@@ -200,7 +205,7 @@
 
             // Load Data
             useEffect(() => {
-                const savedData = localStorage.getItem('captionGenData_v6_pro');
+                const savedData = localStorage.getItem('captionGenData_v7_pro');
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
                     setAutoForm(parsed.autoForm || { productName: '', price: '', link: '', description: '' });
@@ -209,21 +214,22 @@
                     setSelectedCategory(parsed.selectedCategory || 'gadget');
                     setDarkMode(parsed.darkMode || false);
                     if(parsed.currentItem) setCurrentItem(parsed.currentItem);
-                    if(parsed.templates) setTemplates(parsed.templates); // Load custom templates
+                    if(parsed.templates) setTemplates(parsed.templates); 
                     if(parsed.templateConfig) setTemplateConfig(parsed.templateConfig);
+                    if(parsed.sectionOrder) setSectionOrder(parsed.sectionOrder);
                 }
             }, []);
 
             // Save Data
             useEffect(() => {
                 const dataToSave = {
-                    autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates
+                    autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates, sectionOrder
                 };
-                localStorage.setItem('captionGenData_v6_pro', JSON.stringify(dataToSave));
+                localStorage.setItem('captionGenData_v7_pro', JSON.stringify(dataToSave));
                 
                 if (darkMode) document.documentElement.classList.add('dark');
                 else document.documentElement.classList.remove('dark');
-            }, [autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates]);
+            }, [autoForm, hashtags, idSettings, selectedCategory, darkMode, currentItem, templateConfig, templates, sectionOrder]);
 
             // Change Template Config when Category Changes
             useEffect(() => {
@@ -244,24 +250,50 @@
                     const tagString = generateHashtags(hashtags);
                     let caption = "";
 
-                    if (templateConfig.opening.enabled) caption += templateConfig.opening.text + "\n";
-                    caption += (autoForm.productName || "[Nama Produk]") + "\n";
-                    if (autoForm.description) caption += autoForm.description + "\n";
-                    
-                    if (templateConfig.conditions.enabled) caption += templateConfig.conditions.text + "\n\n";
-                    else caption += "\n"; 
-
-                    if (templateConfig.priceLabel.enabled) caption += `${templateConfig.priceLabel.text} : Rp.${autoForm.price || "..."}\n`;
-                    else caption += `Rp.${autoForm.price || "..."}\n`;
-
-                    if (templateConfig.linkLabel.enabled) caption += `${templateConfig.linkLabel.text} ${autoForm.link || "..."}${tagString}`;
-                    else caption += `${autoForm.link || "..."}${tagString}`;
+                    sectionOrder.forEach(sectionId => {
+                        switch(sectionId) {
+                            case 'opening':
+                                if (templateConfig.opening.enabled) caption += templateConfig.opening.text + "\n";
+                                break;
+                            case 'productName':
+                                caption += (autoForm.productName || "[Nama Produk]") + "\n";
+                                break;
+                            case 'description':
+                                if (autoForm.description) caption += autoForm.description + "\n";
+                                break;
+                            case 'conditions':
+                                if (templateConfig.conditions.enabled) caption += templateConfig.conditions.text + "\n\n";
+                                else caption += "\n";
+                                break;
+                            case 'price':
+                                if (templateConfig.priceLabel.enabled) caption += `${templateConfig.priceLabel.text} : Rp.${autoForm.price || "..."}\n`;
+                                else caption += `Rp.${autoForm.price || "..."}\n`;
+                                break;
+                            case 'link':
+                                if (templateConfig.linkLabel.enabled) caption += `${templateConfig.linkLabel.text} ${autoForm.link || "..."}`;
+                                else caption += `${autoForm.link || "..."}`;
+                                break;
+                            case 'hashtags':
+                                caption += tagString;
+                                break;
+                        }
+                    });
 
                     setCaptionInput(caption);
                 }
-            }, [activeTab, autoForm, hashtags, templateConfig]);
+            }, [activeTab, autoForm, hashtags, templateConfig, sectionOrder]);
 
             // --- FUNCTIONS ---
+
+            const moveSection = (index, direction) => {
+                const newOrder = [...sectionOrder];
+                const targetIndex = direction === 'up' ? index - 1 : index + 1;
+                
+                if (targetIndex >= 0 && targetIndex < newOrder.length) {
+                    [newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]];
+                    setSectionOrder(newOrder);
+                }
+            };
 
             const saveNewPreset = () => {
                 if (!newPresetName.trim()) return alert("Nama preset tidak boleh kosong!");
@@ -305,7 +337,6 @@
                 const newId = generateID();
                 let processedText = processSpintax(captionInput);
                 
-                // APPLY AI TONE
                 if (selectedTone) {
                     processedText = applyAiTone(processedText, selectedTone);
                 }
@@ -342,7 +373,6 @@
                 } catch (err) { console.error(err); }
             };
 
-            // Formatting Function
             const applyFormatting = (format) => {
                 const textarea = resultTextAreaRef.current;
                 if (!textarea) return;
@@ -360,16 +390,10 @@
 
                 const newText = textarea.value.substring(0, start) + wrapper + sel + wrapper + textarea.value.substring(end);
                 
-                // Update state but keep ID separate
-                // Actually currentItem.text is the main content
-                // We need to be careful not to double append ID. 
-                // The textarea displays `text + ID`. We need to strip ID before saving back to state.
                 const idSuffix = `\n_ID: ${currentItem.id}_`;
                 const textOnly = newText.replace(idSuffix, "");
                 
                 setCurrentItem({ ...currentItem, text: textOnly });
-                
-                // Restore selection/cursor is tricky in React state update, simple focus for now
                 textarea.focus();
             };
 
@@ -402,7 +426,6 @@
                 link.click();
             };
 
-            // Helper to update template config
             const toggleSection = (key) => {
                 setTemplateConfig(prev => ({ ...prev, [key]: { ...prev[key], enabled: !prev[key].enabled } }));
             };
@@ -411,20 +434,42 @@
                 setTemplateConfig(prev => ({ ...prev, [key]: { ...prev[key], text } }));
             };
 
-            const renderTemplateSection = (key, label, placeholder) => {
+            const renderSectionHeaderButtons = (id, index) => (
+                <div className="flex gap-1 ml-auto">
+                    <button 
+                        onClick={() => moveSection(index, 'up')} 
+                        disabled={index === 0}
+                        className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'text-gray-500 dark:text-gray-400'}`}
+                    >
+                        <Icon path={paths.arrowUp} size={12}/>
+                    </button>
+                    <button 
+                        onClick={() => moveSection(index, 'down')} 
+                        disabled={index === sectionOrder.length - 1}
+                        className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition ${index === sectionOrder.length - 1 ? 'opacity-30 cursor-not-allowed' : 'text-gray-500 dark:text-gray-400'}`}
+                    >
+                        <Icon path={paths.arrowDown} size={12}/>
+                    </button>
+                </div>
+            );
+
+            const renderTemplateSection = (key, label, placeholder, index) => {
                 const config = templateConfig[key];
                 const isEditing = editingSection === key;
 
                 return (
                     <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm transition-all hover:border-blue-300 dark:hover:border-blue-700">
-                        <div className="flex justify-between items-center mb-2">
-                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <div className="flex items-center mb-2">
+                            <label className="flex items-center gap-2 cursor-pointer select-none mr-2">
                                 <input type="checkbox" checked={config.enabled} onChange={() => toggleSection(key)} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700" />
                                 <span className={`text-xs font-bold uppercase tracking-wider ${config.enabled ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 line-through'}`}>{label}</span>
                             </label>
-                            <button onClick={() => setEditingSection(isEditing ? null : key)} className={`p-1.5 rounded transition ${isEditing ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Edit Template Spintax">
+                            
+                            <button onClick={() => setEditingSection(isEditing ? null : key)} className={`p-1.5 rounded transition mr-2 ${isEditing ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`} title="Edit Template Spintax">
                                 {isEditing ? <Icon path={paths.check} size={14}/> : <Icon path={paths.edit} size={14}/>}
                             </button>
+
+                            {renderSectionHeaderButtons(key, index)}
                         </div>
                         {config.enabled && (
                             <div className="animate-fade-in">
@@ -440,6 +485,16 @@
                     </div>
                 );
             };
+
+            const renderInputSection = (id, label, content, index) => (
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all">
+                    <div className="flex justify-between items-center mb-2">
+                        <label className="text-xs font-bold text-gray-600 dark:text-gray-400">{label}</label>
+                        {renderSectionHeaderButtons(id, index)}
+                    </div>
+                    {content}
+                </div>
+            );
 
             return (
                 <div className="h-dvh flex flex-col overflow-hidden">
@@ -512,46 +567,76 @@
                                 ) : (
                                     <div className="space-y-4">
                                         
-                                        {renderTemplateSection('opening', 'Template Opening', '{Halo|Hai}')}
+                                        {/* Dynamic Sections rendering based on order */}
+                                        {sectionOrder.map((sectionId, index) => {
+                                            switch(sectionId) {
+                                                case 'opening':
+                                                    return <React.Fragment key={sectionId}>{renderTemplateSection('opening', 'Template Opening', '{Halo|Hai}', index)}</React.Fragment>;
+                                                
+                                                case 'productName':
+                                                    return <React.Fragment key={sectionId}>{renderInputSection('productName', 'Nama Produk', 
+                                                        <input type="text" className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-200" placeholder={templates[selectedCategory]?.placeholder || "Contoh..."} value={autoForm.productName} onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})} />
+                                                    , index)}</React.Fragment>;
+                                                
+                                                case 'description':
+                                                    return <React.Fragment key={sectionId}>{renderInputSection('description', 'Deskripsi Tambahan', 
+                                                        <textarea rows="2" className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-gray-200" placeholder="Warna merah, size L..." value={autoForm.description} onChange={(e) => setAutoForm({...autoForm, description: e.target.value})} />
+                                                    , index)}</React.Fragment>;
+                                                
+                                                case 'conditions':
+                                                    return <React.Fragment key={sectionId}>{renderTemplateSection('conditions', 'Template Kondisi/Ket.', '{Baru|Bekas}', index)}</React.Fragment>;
+                                                
+                                                case 'price':
+                                                    return <React.Fragment key={sectionId}>
+                                                        <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all">
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <div className="flex-1">
+                                                                    {renderTemplateSection('priceLabel', 'Label Harga', '{Harga|Price}', -1)} 
+                                                                    {/* Note: Nested template section inside price block, reusing component but without move buttons on inner part */}
+                                                                </div>
+                                                                {renderSectionHeaderButtons('price', index)}
+                                                            </div>
+                                                            <div className="mt-2">
+                                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="Rp. 150.000" value={autoForm.price} onChange={(e) => setAutoForm({...autoForm, price: e.target.value})} />
+                                                            </div>
+                                                        </div>
+                                                    </React.Fragment>;
+                                                
+                                                case 'link':
+                                                    return <React.Fragment key={sectionId}>
+                                                        <div className="bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-all">
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <div className="flex-1">
+                                                                    {renderTemplateSection('linkLabel', 'Label Link', '{Link|Order}', -1)}
+                                                                </div>
+                                                                {renderSectionHeaderButtons('link', index)}
+                                                            </div>
+                                                            <div className="mt-2">
+                                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="shopee.co.id/..." value={autoForm.link} onChange={(e) => setAutoForm({...autoForm, link: e.target.value})} />
+                                                            </div>
+                                                        </div>
+                                                    </React.Fragment>;
+                                                
+                                                case 'hashtags':
+                                                    return <React.Fragment key={sectionId}>{renderInputSection('hashtags', 'Hashtag', 
+                                                        <div>
+                                                            <div className="flex items-center gap-1 mb-1 text-xs text-gray-500"><Icon path={paths.hash} /> (Pisahkan dengan koma)</div>
+                                                            <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm dark:text-gray-200" placeholder="sepatu, murah, promo" value={hashtags} onChange={(e) => setHashtags(e.target.value)} />
+                                                        </div>
+                                                    , index)}</React.Fragment>;
+                                                
+                                                default: return null;
+                                            }
+                                        })}
 
-                                        <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1 block">Nama Produk</label>
-                                                <input type="text" className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-200" placeholder="Contoh: Sony A6000" value={autoForm.productName} onChange={(e) => setAutoForm({...autoForm, productName: e.target.value})} />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1 block">Deskripsi Tambahan</label>
-                                                <textarea rows="2" className="w-full p-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-gray-200" placeholder="Warna merah, size L..." value={autoForm.description} onChange={(e) => setAutoForm({...autoForm, description: e.target.value})} />
-                                            </div>
-                                        </div>
-
-                                        {renderTemplateSection('conditions', 'Template Kondisi/Ket.', '{Baru|Bekas}')}
-
-                                        <div className="space-y-2">
-                                            {renderTemplateSection('priceLabel', 'Label Harga', '{Harga|Price}')}
-                                            <div className="pl-2">
-                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="Rp. 150.000" value={autoForm.price} onChange={(e) => setAutoForm({...autoForm, price: e.target.value})} />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            {renderTemplateSection('linkLabel', 'Label Link', '{Link|Order}')}
-                                            <div className="pl-2">
-                                                <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-transparent dark:text-gray-200" placeholder="shopee.co.id/..." value={autoForm.link} onChange={(e) => setAutoForm({...autoForm, link: e.target.value})} />
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-2 border-t border-dashed dark:border-gray-700">
-                                            <label className="text-xs font-bold text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1"><Icon path={paths.hash} /> Hashtag (Pisahkan dengan koma)</label>
-                                            <input type="text" className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm dark:text-gray-200" placeholder="sepatu, murah, promo" value={hashtags} onChange={(e) => setHashtags(e.target.value)} />
-                                        </div>
+                                        {/* Preview Box removed per request */}
                                     </div>
                                 )}
 
                                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                                     <div className="flex items-center gap-2 mb-3 text-gray-700 dark:text-gray-300 font-bold text-xs uppercase"><Icon path={paths.settings} /> Pengaturan ID Unik</div>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Prefix</label><input type="text" placeholder="TOKO-" className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.prefix} onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})} /></div>
+                                        <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Prefix</label><input type="text" placeholder="Contoh: TOKO-" className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.prefix} onChange={(e) => setIdSettings({...idSettings, prefix: e.target.value})} /></div>
                                         <div><label className="text-[10px] text-gray-500 dark:text-gray-400 block mb-1">Mode ID</label><select className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.mode} onChange={(e) => setIdSettings({...idSettings, mode: e.target.value})}><option value="random">Acak</option><option value="sequential">Urut</option></select></div>
                                     </div>
                                     {idSettings.mode === 'sequential' && (<div className="mt-2 flex items-center gap-2"><label className="text-xs text-gray-500 dark:text-gray-400">Mulai dari:</label><input type="number" className="p-1 border border-gray-300 dark:border-gray-600 rounded w-20 text-xs bg-white dark:bg-gray-700 dark:text-gray-200" value={idSettings.startSeq} onChange={(e) => setIdSettings({...idSettings, startSeq: e.target.value})} /></div>)}
@@ -584,7 +669,7 @@
                                     <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 p-1.5 rounded-md"><Icon path={paths.edit} /></span>
                                     <div>
                                         <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">Hasil Caption Anda</h3>
-                                        <p className="text-[10px] text-gray-400">Blok teks untuk format bold/italic</p>
+                                        <p className="text-[10px] text-gray-400">Copy untuk mengganti otomatis</p>
                                     </div>
                                 </div>
                                 <button onClick={generateNewResult} className="text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded border border-blue-200 dark:border-blue-900 transition flex items-center gap-1">
